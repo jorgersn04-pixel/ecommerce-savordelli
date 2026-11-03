@@ -69,7 +69,7 @@ CREATE TABLE sessoes_refresh (
   id          BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   tipo_usuario ENUM('cliente','admin') NOT NULL,
   usuario_id  BIGINT UNSIGNED NOT NULL,
-  token_hash  CHAR(64) NOT NULL UNIQUE,
+  token_hash  VARCHAR(255) NOT NULL UNIQUE,            -- argon2id do segredo (token = id.segredo)
   ip          VARBINARY(16) NULL,
   user_agent  VARCHAR(255) NULL,
   expira_em   TIMESTAMP NOT NULL,

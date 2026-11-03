@@ -6,6 +6,7 @@ const health = require('./health.routes');
 const router = Router();
 
 router.use('/health', health);
-// Fase 1: router.use('/auth', ...), router.use('/admin', ...)
+router.use('/auth', require('./auth.routes'));
+router.use('/admin', require('./admin.routes'));
 
 module.exports = router;
