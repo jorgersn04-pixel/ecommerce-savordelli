@@ -61,3 +61,17 @@ Direitos do titular implementados em `backend/src/services/lgpd.service.js`:
   apaga enderecos e carrinho, revoga sessoes. Bloqueia se houver pedido em andamento.
 - Guarda fiscal: pedidos pagos mantem nome, CPF (cifrado) e endereco por 5 anos (art. 16, I); depois um job diario apaga esses snapshots.
   Pedidos nunca pagos tem os snapshots apagados na hora. A prova de consentimento e preservada.
+
+## Vitrine da loja
+
+HTML/CSS/JS puro em `frontend/loja/`, servida pela API em `/loja/` (a raiz `/` redireciona para ela):
+
+```
+cd backend && npm run dev
+# abra http://localhost:3000/
+```
+
+Paginas: `index.html` (home, busca e listagem por categoria) e `produto.html?slug=...`. Design System "Ouro sobre creme" em
+`css/tokens.css` (variaveis `:root`). Regras de conversao: um unico botao ouro por tela; barra fixa de compra no mobile; faixa de
+confianca junto ao botao. Enquanto o catalogo estiver vazio (ou a API fora do ar) a vitrine exibe produtos de demonstracao
+(`js/mock.js`); desligue com `DEMO_SE_VAZIO: false` em `js/config.js`.

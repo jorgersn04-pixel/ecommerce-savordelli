@@ -1,0 +1,135 @@
+.migalhas { padding: 20px 0 8px; font-size: 0.875rem; color: var(--cor-texto-2); }
+.migalhas ol { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0; padding: 0; }
+.migalhas li + li::before { content: '/'; margin-right: 8px; color: var(--cor-borda); }
+.migalhas a { color: var(--cor-texto-2); }
+.migalhas [aria-current='page'] { color: var(--cor-texto); font-weight: 600; }
+
+.produto {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 48px;
+  padding: 16px 0 56px;
+  align-items: start;
+}
+
+/* ---------------------------------------------------------------- Galeria */
+.galeria { display: grid; gap: 14px; }
+.galeria-principal {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: var(--cor-card);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  overflow: hidden;
+}
+.galeria-principal img { width: 100%; height: 100%; object-fit: contain; }
+.galeria-principal .selo-desconto { position: absolute; top: 16px; left: 16px; z-index: 1; font-size: 0.9375rem; padding: 6px 12px; }
+.miniaturas { display: flex; gap: 10px; flex-wrap: wrap; list-style: none; margin: 0; padding: 0; }
+.miniatura {
+  width: 76px;
+  height: 76px;
+  padding: 0;
+  background: var(--cor-card);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-pequeno);
+  overflow: hidden;
+  cursor: pointer;
+}
+.miniatura img { width: 100%; height: 100%; object-fit: cover; }
+.miniatura[aria-current='true'] { border: 2px solid var(--cor-texto); }
+
+/* ---------------------------------------------------------------- Informacoes */
+.produto-info { display: grid; gap: 20px; }
+.produto-marca { font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cor-texto-2); }
+.produto-info h1 { font-size: clamp(2rem, 3.4vw, 2.75rem); margin-top: 6px; }
+.produto-resumo { color: var(--cor-texto-2); }
+
+.bloco-preco { padding: 20px 0; border-top: 1px solid var(--cor-borda); border-bottom: 1px solid var(--cor-borda); display: grid; gap: 6px; }
+.bloco-preco .linha-preco { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.bloco-preco .preco-por { font-size: 2rem; }
+.bloco-preco .preco-de { font-size: 1rem; }
+.bloco-preco .parcelas { font-size: 0.9375rem; }
+
+.campo-grupo { display: grid; gap: 10px; }
+.campo-rotulo { font-weight: 700; }
+.campo-rotulo small { font-weight: 400; color: var(--cor-texto-2); margin-left: 6px; }
+
+.quantidade { display: inline-flex; align-items: center; border: 1px solid var(--cor-borda); border-radius: var(--raio); background: var(--cor-card); width: fit-content; }
+.quantidade button { width: 46px; height: 46px; display: grid; place-items: center; background: transparent; border: 0; cursor: pointer; border-radius: var(--raio); }
+.quantidade button:hover:not(:disabled) { background: var(--cor-creme); }
+.quantidade button:disabled { opacity: 0.4; cursor: not-allowed; }
+.quantidade output { min-width: 44px; text-align: center; font-weight: 700; }
+
+.estoque-aviso { font-size: 0.9375rem; font-weight: 600; }
+.estoque-aviso.baixo { color: var(--cor-erro); }
+.estoque-aviso.ok { color: var(--cor-sucesso); }
+
+.compra { display: grid; gap: 14px; }
+.compra .btn { min-height: 56px; font-size: 1.0625rem; }
+
+/* ---------------------------------------------------------------- Faixa de confianca */
+.faixa-confianca {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--cor-card);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+}
+.faixa-confianca li { display: flex; align-items: center; gap: 10px; padding: 14px; font-size: 0.875rem; line-height: 1.3; font-weight: 600; }
+.faixa-confianca li + li { border-left: 1px solid var(--cor-borda); }
+.faixa-confianca .icone { color: var(--cor-sucesso); }
+.faixa-confianca small { display: block; font-weight: 400; color: var(--cor-texto-2); font-size: 0.8125rem; }
+
+/* ---------------------------------------------------------------- Frete */
+.frete { display: grid; gap: 10px; padding: 18px; background: var(--cor-card); border: 1px solid var(--cor-borda); border-radius: var(--raio); }
+.frete form { display: flex; gap: 10px; }
+.frete input { flex: 1; min-width: 0; height: 44px; padding: 0 14px; border: 1px solid var(--cor-borda); border-radius: var(--raio); background: #fffdf9; }
+.frete input:focus-visible { outline-offset: 0; }
+.frete-opcoes { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.frete-opcoes li { display: flex; justify-content: space-between; gap: 12px; padding-top: 8px; border-top: 1px solid var(--cor-borda); font-size: 0.9375rem; }
+.frete-opcoes .prazo { color: var(--cor-texto-2); display: block; font-size: 0.8125rem; }
+
+/* ---------------------------------------------------------------- Descricao */
+.descricao-longa { padding: 40px 0 56px; border-top: 1px solid var(--cor-borda); }
+.descricao-longa h2 { margin-bottom: 18px; }
+.descricao-longa h2::after { content: ''; display: block; width: 56px; height: 2px; margin-top: 12px; background: var(--cor-ouro); }
+.descricao-longa p { color: var(--cor-texto-2); max-width: 70ch; white-space: pre-line; }
+
+/* ---------------------------------------------------------------- Barra fixa mobile */
+.barra-mobile { display: none; }
+
+@media (max-width: 900px) {
+  .produto { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .miniatura { width: 64px; height: 64px; }
+}
+
+@media (max-width: 767px) {
+  /* A acao principal passa para a barra fixa: evita dois botoes ouro na mesma tela. */
+  .compra .btn-ouro { display: none; }
+  .barra-mobile {
+    display: grid;
+    gap: 8px;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 60;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    background: var(--cor-card);
+    border-top: 1px solid var(--cor-borda);
+    box-shadow: var(--sombra-barra);
+  }
+  .barra-mobile .mini-confianca { font-size: 0.75rem; color: var(--cor-texto-2); font-weight: 600; text-align: center; }
+  .barra-mobile .linha { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 14px; }
+  .barra-mobile .barra-preco strong { display: block; font-size: 1.25rem; line-height: 1.1; }
+  .barra-mobile .barra-preco small { color: var(--cor-texto-2); font-size: 0.75rem; }
+  .barra-mobile .btn { min-height: 52px; padding: 0 28px; }
+  body.com-barra { padding-bottom: 112px; }
+  .faixa-confianca { grid-template-columns: minmax(0, 1fr); }
+  .faixa-confianca li + li { border-left: 0; border-top: 1px solid var(--cor-borda); }
+  .toast { bottom: 128px; }
+}

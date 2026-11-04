@@ -1,0 +1,239 @@
+/* ---------------------------------------------------------------- Botoes
+ * .btn-ouro = acao principal da tela. Use no maximo UMA vez por tela.
+ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 24px;
+  border: 1.5px solid transparent;
+  border-radius: var(--raio);
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+.btn:disabled,
+.btn[aria-disabled='true'] { opacity: 0.55; cursor: not-allowed; }
+
+.btn-ouro { background: var(--cor-ouro); color: var(--cor-ouro-texto); }
+.btn-ouro:hover:not(:disabled) { background: var(--cor-ouro-hover); }
+
+/* Secundario sobre claro */
+.btn-contorno { background: transparent; color: var(--cor-texto); border-color: var(--cor-texto); }
+.btn-contorno:hover:not(:disabled) { background: var(--cor-texto); color: var(--cor-creme); }
+
+/* Secundario sobre escuro (banners, header) */
+.btn-contorno-ouro { background: transparent; color: var(--cor-ouro); border-color: var(--cor-ouro); }
+.btn-contorno-ouro:hover:not(:disabled) { background: rgba(201, 151, 43, 0.14); }
+
+.btn-bloco { width: 100%; }
+.btn-pequeno { min-height: 40px; padding: 0 16px; font-size: 0.9375rem; }
+
+/* ---------------------------------------------------------------- Selos */
+.selo-desconto {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: var(--cor-bordo);
+  color: #ffffff;
+  border-radius: var(--raio-pequeno);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.etiqueta {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: var(--raio-pequeno);
+  border: 1px solid var(--cor-borda);
+  background: var(--cor-creme);
+  color: var(--cor-texto-2);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------------- Titulo de secao */
+.secao { padding: 56px 0; }
+.secao-cabecalho {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+.secao-titulo::after {
+  content: '';
+  display: block;
+  width: 56px;
+  height: 2px;
+  margin-top: 12px;
+  background: var(--cor-ouro);
+}
+.secao-sub { color: var(--cor-texto-2); margin-top: 8px; }
+
+.link-sutil {
+  color: var(--cor-texto);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: var(--cor-ouro);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 5px;
+}
+.link-sutil:hover { text-decoration-color: var(--cor-texto); }
+
+/* ---------------------------------------------------------------- Grid e card de produto */
+.grade-produtos {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.card-produto {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--cor-card);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.card-produto:hover { box-shadow: var(--sombra-hover); border-color: #d8c9ae; }
+.card-produto .selo-desconto { position: absolute; top: 12px; left: 12px; z-index: 1; }
+
+.card-imagem {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: var(--cor-creme);
+  border-bottom: 1px solid var(--cor-borda);
+}
+.card-imagem img { width: 100%; height: 100%; object-fit: cover; }
+.card-produto.indisponivel .card-imagem img { opacity: 0.45; }
+
+.sem-imagem {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  font-family: var(--fonte-titulo);
+  font-weight: 600;
+  font-size: 3rem;
+  color: var(--cor-ouro);
+  background: linear-gradient(160deg, #fffdf9, #f3ead9);
+}
+
+.card-corpo { display: flex; flex-direction: column; gap: 6px; padding: 16px; flex: 1; }
+.card-marca { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--cor-texto-2); }
+.card-nome {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.7em;
+}
+.card-precos { margin-top: auto; padding-top: 8px; min-height: 72px; display: flex; flex-direction: column; justify-content: flex-end; }
+.card-precos .linha-preco-card { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 6px; }
+
+/* ---------------------------------------------------------------- Precos */
+.preco-de { color: var(--cor-texto-2); font-size: 0.875rem; text-decoration: line-through; margin-right: 6px; }
+.preco-por { font-weight: 700; font-size: 1.25rem; color: var(--cor-texto); }
+.parcelas { display: block; font-size: 0.8125rem; color: var(--cor-texto-2); margin-top: 2px; }
+.aviso-indisponivel { font-size: 0.8125rem; font-weight: 700; color: var(--cor-erro); }
+
+/* ---------------------------------------------------------------- Chips */
+.chips { display: flex; flex-wrap: wrap; gap: 10px; list-style: none; margin: 0; padding: 0; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  background: var(--cor-card);
+  color: var(--cor-texto);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+.chip:hover { border-color: var(--cor-texto); }
+.chip[aria-current='true'],
+.chip[aria-pressed='true'] { border-color: var(--cor-texto); background: var(--cor-texto); color: var(--cor-creme); }
+.chip:disabled { opacity: 0.45; cursor: not-allowed; text-decoration: line-through; }
+
+/* ---------------------------------------------------------------- Estados */
+.skeleton {
+  background: linear-gradient(90deg, #f1e9d9 25%, #f8f2e6 50%, #f1e9d9 75%);
+  background-size: 200% 100%;
+  animation: brilho 1.4s linear infinite;
+  border-radius: var(--raio-pequeno);
+}
+@keyframes brilho { to { background-position: -200% 0; } }
+.skeleton-card { height: 360px; border-radius: var(--raio); }
+
+.vazio {
+  padding: 64px 20px;
+  text-align: center;
+  background: var(--cor-card);
+  border: 1px dashed var(--cor-borda);
+  border-radius: var(--raio);
+  color: var(--cor-texto-2);
+}
+.vazio strong { display: block; font-size: 1.125rem; color: var(--cor-texto); margin-bottom: 6px; }
+
+.aviso {
+  padding: 12px 16px;
+  border-radius: var(--raio);
+  border: 1px solid var(--cor-borda);
+  background: #fff8e8;
+  color: var(--cor-texto);
+  font-size: 0.9375rem;
+}
+.aviso-erro { border-color: #e6b3af; background: #fdf1f0; color: var(--cor-erro); }
+.aviso-sucesso { border-color: #b5d9c4; background: #eef8f2; color: var(--cor-sucesso); }
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 200;
+  max-width: min(440px, calc(100vw - 32px));
+  padding: 14px 20px;
+  border-radius: var(--raio);
+  background: var(--cor-escuro);
+  color: var(--cor-texto-claro);
+  border-left: 4px solid var(--cor-sucesso);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+  font-weight: 600;
+}
+.toast.erro { border-left-color: var(--cor-erro); }
+
+.icone { width: 22px; height: 22px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---------------------------------------------------------------- Responsivo */
+@media (max-width: 1024px) {
+  .grade-produtos { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .grade-produtos { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .card-corpo { padding: 12px; }
+  .secao { padding: 40px 0; }
+  .skeleton-card { height: 300px; }
+}

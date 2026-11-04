@@ -1,0 +1,56 @@
+/*
+ * Design System Savordelli - "Ouro sobre creme"
+ *
+ * Regras de uso:
+ *  - Fundo escuro (--cor-escuro) SOMENTE em header, footer e banners.
+ *  - Catalogo em creme (--cor-creme) com cards brancos.
+ *  - Ouro (--cor-ouro) e a cor do botao principal: no maximo UM botao ouro por tela.
+ *  - Ouro NAO e cor de texto sobre fundo claro (contraste insuficiente); la use --cor-texto.
+ *  - Bordo (--cor-bordo) apenas em selos de desconto.
+ */
+:root {
+  /* Superficies */
+  --cor-escuro: #14110d;
+  --cor-escuro-2: #1d1914;
+  --cor-creme: #faf6ef;
+  --cor-card: #ffffff;
+  --cor-borda: #e6dccb;
+
+  /* Marca */
+  --cor-ouro: #c9972b;
+  --cor-ouro-hover: #b68622;
+  --cor-ouro-texto: #1a1410; /* texto sobre ouro */
+  --cor-bordo: #6e2b3a;
+
+  /* Texto */
+  --cor-texto: #1a1410;
+  --cor-texto-2: #4a4036; /* descricoes */
+  --cor-texto-claro: #f5eee1; /* texto sobre fundo escuro */
+  --cor-texto-claro-2: #c9bda8;
+
+  /* Status */
+  --cor-sucesso: #2e7d4f;
+  --cor-erro: #b3261e;
+
+  /* Tipografia */
+  --fonte-titulo: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --fonte-ui: 'Nunito Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+
+  /* Forma */
+  --raio: 12px; /* botoes e cards: cantos arredondados, nunca pilula */
+  --raio-pequeno: 8px;
+  --sombra-hover: 0 10px 28px rgba(90, 58, 20, 0.14);
+  --sombra-barra: 0 -6px 22px rgba(90, 58, 20, 0.12);
+
+  /* Layout */
+  --largura-max: 1200px;
+  --gutter: 20px;
+  --altura-header: 72px;
+
+  /* Foco: escuro sobre claro; ouro sobre escuro (ver .escuro) */
+  --cor-foco: #1a1410;
+}
+
+.escuro {
+  --cor-foco: #c9972b;
+}

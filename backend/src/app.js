@@ -24,7 +24,12 @@ app.use(
     contentSecurityPolicy: {
       useDefaults: true,
       // Imagens de produto vem de CDN externo (https). Scripts e estilos: somente do proprio dominio.
-      directives: { 'img-src': ["'self'", 'data:', 'https:'], 'style-src': ["'self'"] },
+      directives: {
+        'img-src': ["'self'", 'data:', 'https:'],
+        // Google Fonts (Cormorant Garamond e Nunito Sans) usados pela vitrine.
+        'style-src': ["'self'", 'https://fonts.googleapis.com'],
+        'font-src': ["'self'", 'https://fonts.gstatic.com'],
+      },
     },
   }),
 );
@@ -45,6 +50,10 @@ app.use(cookieParser());
 
 // Painel administrativo (HTML/CSS/JS estaticos), mesmo dominio da API: sem CORS e com cookie de refresh restrito.
 app.use('/painel', express.static(path.resolve(__dirname, '../../frontend/admin'), { index: 'index.html', maxAge: env.isProd ? '1h' : 0 }));
+
+// Vitrine publica (HTML/CSS/JS estaticos). A raiz redireciona para a loja.
+app.use('/loja', express.static(path.resolve(__dirname, '../../frontend/loja'), { index: 'index.html', maxAge: env.isProd ? '1h' : 0 }));
+app.get('/', (_req, res) => res.redirect('/loja/'));
 
 app.use(routes);
 
