@@ -2,7 +2,6 @@
 
 const { Router } = require('express');
 const { autenticar } = require('../middlewares/auth');
-const { exigirPermissao } = require('../middlewares/rbac');
 
 const router = Router();
 
@@ -13,13 +12,6 @@ router.get('/me', (req, res) => {
   res.json({ usuario: req.usuario });
 });
 
-// Rotas de verificacao do RBAC (serao substituidas pelos modulos reais).
-router.get('/produtos/ping', exigirPermissao('produtos.ler'), (_req, res) => {
-  res.json({ ok: true, recurso: 'produtos' });
-});
-
-router.get('/financeiro/ping', exigirPermissao('notas.ler'), (_req, res) => {
-  res.json({ ok: true, recurso: 'notas' });
-});
+router.use(require('./admin.catalogo.routes'));
 
 module.exports = router;

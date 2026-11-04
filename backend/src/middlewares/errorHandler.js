@@ -22,6 +22,12 @@ function errorHandler(err, req, res, _next) {
   if (err.type === 'entity.too.large') {
     return res.status(413).json({ erro: { codigo: 'PAYLOAD_GRANDE', mensagem: 'Corpo da requisicao muito grande' } });
   }
+  if (err.code === 'ER_DUP_ENTRY') {
+    return res.status(409).json({ erro: { codigo: 'CONFLITO', mensagem: 'Registro duplicado (valor ja existente)' } });
+  }
+  if (err.code === 'ER_NO_REFERENCED_ROW_2') {
+    return res.status(400).json({ erro: { codigo: 'REFERENCIA_INVALIDA', mensagem: 'Referencia a registro inexistente' } });
+  }
   if (err instanceof AppError) {
     return res.status(err.status).json({
       erro: { codigo: err.codigo, mensagem: err.message, detalhes: err.detalhes },
