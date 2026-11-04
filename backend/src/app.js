@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require('path');
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
@@ -18,7 +19,15 @@ app.disable('x-powered-by');
 app.set('trust proxy', 1);
 
 app.use(pinoHttp({ logger, autoLogging: { ignore: (req) => req.url.startsWith('/health') } }));
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      useDefaults: true,
+      // Imagens de produto vem de CDN externo (https). Scripts e estilos: somente do proprio dominio.
+      directives: { 'img-src': ["'self'", 'data:', 'https:'], 'style-src': ["'self'"] },
+    },
+  }),
+);
 app.use(
   cors({
     origin(origin, cb) {
@@ -33,6 +42,9 @@ app.use(rateLimit({ windowMs: 60_000, limit: 300, standardHeaders: 'draft-7', le
 // rawBody: necessario para validar a assinatura HMAC dos webhooks (Bling).
 app.use(express.json({ limit: '1mb', verify: (req, _res, buf) => { req.rawBody = buf; } }));
 app.use(cookieParser());
+
+// Painel administrativo (HTML/CSS/JS estaticos), mesmo dominio da API: sem CORS e com cookie de refresh restrito.
+app.use('/painel', express.static(path.resolve(__dirname, '../../frontend/admin'), { index: 'index.html', maxAge: env.isProd ? '1h' : 0 }));
 
 app.use(routes);
 

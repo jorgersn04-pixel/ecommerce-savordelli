@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="color-scheme" content="dark">
+  <title>Entrar - Painel Savordelli</title>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <main class="auth-page">
+    <section class="card auth-card" aria-labelledby="titulo-login">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">S</div>
+        <div class="brand-text">
+          <span class="brand-name">Savordelli</span>
+          <span class="brand-sub">Painel administrativo</span>
+        </div>
+      </div>
+
+      <div>
+        <h1 id="titulo-login">Entrar</h1>
+        <p class="muted">Acesso restrito a equipe autorizada.</p>
+      </div>
+
+      <form id="form-login" class="stack" novalidate>
+        <div id="login-erro" class="alert danger" role="alert" hidden></div>
+        <div class="field">
+          <label for="email">E-mail</label>
+          <input class="input" id="email" name="email" type="email" autocomplete="username" required autofocus>
+        </div>
+        <div class="field">
+          <label for="senha">Senha</label>
+          <input class="input" id="senha" name="senha" type="password" autocomplete="current-password" required>
+        </div>
+        <button class="btn primary" id="btn-login" type="submit">Entrar</button>
+      </form>
+    </section>
+  </main>
+  <script type="module" src="js/login.js"></script>
+</body>
+</html>

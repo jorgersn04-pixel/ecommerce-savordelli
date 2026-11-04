@@ -1,0 +1,47 @@
+/* Design tokens - Dark Mode e o unico tema do painel. */
+:root {
+  color-scheme: dark;
+
+  --bg: #0e1014;
+  --surface: #151920;
+  --surface-2: #1b212b;
+  --surface-3: #232a36;
+  --border: #2a313d;
+  --border-strong: #3a4352;
+
+  --text: #e7eaf0;
+  --text-muted: #9ba5b4;
+  --text-faint: #6f7a8a;
+
+  --accent: #d9728f;
+  --accent-hover: #e48aa3;
+  --accent-contrast: #1a0f13;
+  --accent-soft: rgba(217, 114, 143, 0.14);
+
+  --ok: #3fb27f;
+  --ok-soft: rgba(63, 178, 127, 0.14);
+  --warn: #e0a43a;
+  --warn-soft: rgba(224, 164, 58, 0.14);
+  --danger: #e5596a;
+  --danger-soft: rgba(229, 89, 106, 0.14);
+  --info: #5b9dff;
+  --info-soft: rgba(91, 157, 255, 0.14);
+
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  --font: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --sidebar-w: 248px;
+  --topbar-h: 60px;
+  --shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+}

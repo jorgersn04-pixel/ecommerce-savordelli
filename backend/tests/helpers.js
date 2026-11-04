@@ -18,7 +18,7 @@ if (habilitado) {
 }
 
 const TABELAS = [
-  'logs_auditoria', 'bling_sync_fila', 'bling_sync_logs', 'consentimentos_registro', 'solicitacoes_titular',
+  'logs_auditoria', 'bling_sync_fila', 'bling_sync_logs', 'bling_webhook_eventos', 'bling_credenciais', 'consentimentos_registro', 'solicitacoes_titular',
   'notas_fiscais', 'envios', 'pagamentos', 'pedido_historico_status', 'pedido_itens', 'pedidos',
   'carrinho_itens', 'carrinhos', 'cupons', 'frete_cotacoes_cache', 'estoque_movimentacoes',
   'produto_imagens', 'produto_categorias', 'produto_variacoes', 'produtos', 'categorias', 'marcas',
