@@ -36,6 +36,13 @@ const schema = z.object({
   MERCADOPAGO_ACCESS_TOKEN: z.string().optional(),
   MERCADOPAGO_WEBHOOK_SECRET: z.string().optional(),
   API_PUBLIC_URL: z.string().url().optional(),
+
+  // Bling ERP v3 (OAuth2). Sem BLING_CLIENT_ID em dev/test usa um Bling simulado; em producao e obrigatorio.
+  BLING_CLIENT_ID: z.string().optional(),
+  BLING_CLIENT_SECRET: z.string().optional(),
+  BLING_REDIRECT_URI: z.string().url().optional(),
+  BLING_DEPOSITO_ID: z.string().regex(/^\d+$/).optional(),
+  BLING_WORKER: z.enum(['on', 'off']).default('on'),
 });
 
 const parsed = schema.safeParse(process.env);

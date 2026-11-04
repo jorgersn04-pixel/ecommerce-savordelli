@@ -30,7 +30,8 @@ app.use(
   }),
 );
 app.use(rateLimit({ windowMs: 60_000, limit: 300, standardHeaders: 'draft-7', legacyHeaders: false }));
-app.use(express.json({ limit: '1mb' }));
+// rawBody: necessario para validar a assinatura HMAC dos webhooks (Bling).
+app.use(express.json({ limit: '1mb', verify: (req, _res, buf) => { req.rawBody = buf; } }));
 app.use(cookieParser());
 
 app.use(routes);

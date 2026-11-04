@@ -7,14 +7,19 @@ const AppError = require('../utils/AppError');
  * Cliente HTTP minimo para integracoes: timeout, JSON e erro padronizado.
  * Nunca registra corpo nem headers (podem conter token ou dados pessoais).
  */
-async function requisitar(servico, url, { metodo = 'GET', headers = {}, corpo, timeoutMs = 10_000 } = {}) {
+async function requisitar(servico, url, { metodo = 'GET', headers = {}, corpo, corpoForm, timeoutMs = 10_000 } = {}) {
   const inicio = Date.now();
   let resp;
   try {
     resp = await fetch(url, {
       method: metodo,
-      headers: { Accept: 'application/json', ...(corpo ? { 'Content-Type': 'application/json' } : {}), ...headers },
-      body: corpo ? JSON.stringify(corpo) : undefined,
+      headers: {
+        Accept: 'application/json',
+        ...(corpo ? { 'Content-Type': 'application/json' } : {}),
+        ...(corpoForm ? { 'Content-Type': 'application/x-www-form-urlencoded' } : {}),
+        ...headers,
+      },
+      body: corpoForm ?? (corpo ? JSON.stringify(corpo) : undefined),
       signal: AbortSignal.timeout(timeoutMs),
     });
   } catch (err) {
@@ -29,7 +34,7 @@ async function requisitar(servico, url, { metodo = 'GET', headers = {}, corpo, t
     json = null;
   }
   logger.info({ servico, metodo, status: resp.status, ms: Date.now() - inicio }, 'integracao: resposta');
-  return { status: resp.status, ok: resp.ok, json };
+  return { status: resp.status, ok: resp.ok, json, headers: resp.headers };
 }
 
 module.exports = { requisitar };
