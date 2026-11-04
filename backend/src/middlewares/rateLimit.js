@@ -22,4 +22,12 @@ const limiteRefresh = rateLimit({
   message: mensagem('MUITAS_TENTATIVAS', 'Muitas requisicoes. Tente novamente em alguns minutos'),
 });
 
-module.exports = { limiteLogin, limiteRefresh };
+const limiteRegistro = rateLimit({
+  windowMs: 60 * 60_000,
+  limit: 10,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: mensagem('MUITAS_TENTATIVAS', 'Muitos cadastros a partir deste IP. Tente mais tarde'),
+});
+
+module.exports = { limiteLogin, limiteRefresh, limiteRegistro };

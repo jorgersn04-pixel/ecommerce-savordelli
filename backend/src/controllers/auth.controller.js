@@ -7,6 +7,8 @@ const { ipParaBuffer } = require('../utils/ip');
 const authService = require('../services/auth.service');
 const { revogarRefreshToken } = require('../services/token.service');
 
+const { registrar: registrarSchema } = require('../validators/cliente.validators');
+
 const loginSchema = z.object({
   email: z.string().trim().toLowerCase().email().max(190),
   senha: z.string().min(1).max(200),
@@ -14,6 +16,7 @@ const loginSchema = z.object({
 
 const contexto = (req) => ({
   ip: ipParaBuffer(req.ip),
+  ipTexto: req.ip,
   userAgent: (req.get('user-agent') || '').slice(0, 255) || null,
 });
 
@@ -21,7 +24,7 @@ const contexto = (req) => ({
  * Cria os handlers de um tipo de usuario. O refresh token trafega apenas em cookie
  * httpOnly (nunca no JSON), com escopo de path restrito a /auth/<tipo>.
  */
-function criarController(tipo, { login, renovar }) {
+function criarController(tipo, { login, renovar, registrar }) {
   const cookieNome = `sv_refresh_${tipo}`;
   const cookiePath = `/auth/${tipo}`;
   const opcoesCookie = (expiraEm) => ({
@@ -39,6 +42,13 @@ function criarController(tipo, { login, renovar }) {
   }
 
   return {
+    ...(registrar && {
+      async registrar(req, res) {
+        const dados = registrarSchema.parse(req.body);
+        responder(res, await registrar(dados, contexto(req)), 201);
+      },
+    }),
+
     async login(req, res) {
       const dados = loginSchema.parse(req.body);
       responder(res, await login(dados, contexto(req)));
@@ -65,6 +75,10 @@ function criarController(tipo, { login, renovar }) {
 }
 
 module.exports = {
-  cliente: criarController('cliente', { login: authService.loginCliente, renovar: authService.renovarCliente }),
+  cliente: criarController('cliente', {
+    login: authService.loginCliente,
+    renovar: authService.renovarCliente,
+    registrar: authService.registrarCliente,
+  }),
   admin: criarController('admin', { login: authService.loginAdmin, renovar: authService.renovarAdmin }),
 };

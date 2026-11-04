@@ -2,7 +2,7 @@
 
 const { Router } = require('express');
 const controllers = require('../controllers/auth.controller');
-const { limiteLogin, limiteRefresh } = require('../middlewares/rateLimit');
+const { limiteLogin, limiteRefresh, limiteRegistro } = require('../middlewares/rateLimit');
 
 const router = Router();
 
@@ -12,5 +12,7 @@ for (const tipo of ['cliente', 'admin']) {
   router.post(`/${tipo}/refresh`, limiteRefresh, c.renovar);
   router.post(`/${tipo}/logout`, c.logout);
 }
+
+router.post('/cliente/registrar', limiteRegistro, controllers.cliente.registrar);
 
 module.exports = router;

@@ -75,4 +75,14 @@ async function renovarAdmin(refreshToken, ctx) {
   return respostaAdmin(admin, accessAdmin(admin), refresh);
 }
 
-module.exports = { loginCliente, renovarCliente, loginAdmin, renovarAdmin };
+/** Cadastro publico: cria o cliente (CPF cifrado, consentimentos) e ja abre a sessao. */
+async function registrarCliente(dados, ctx) {
+  const cliente = await require('./cliente.service').registrar(dados, {
+    ip: ctx.ipTexto,
+    userAgent: ctx.userAgent,
+  });
+  const refresh = await tokens.criarRefreshToken({ tipo: 'cliente', usuarioId: cliente.id, ip: ctx.ip, userAgent: ctx.userAgent });
+  return respostaCliente(cliente, accessCliente(cliente), refresh);
+}
+
+module.exports = { loginCliente, renovarCliente, registrarCliente, loginAdmin, renovarAdmin };
