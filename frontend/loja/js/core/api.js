@@ -41,9 +41,10 @@ async function enviar(metodo, caminho, corpo) {
     throw new ApiError(0, 'REDE', 'Não foi possível conectar. Verifique sua conexão e tente novamente.');
   }
   let dados = null;
-  if (resp.status !== 204) {
+  const texto = await resp.text(); // sempre consome o corpo (inclusive 204)
+  if (texto) {
     try {
-      dados = await resp.json();
+      dados = JSON.parse(texto);
     } catch {
       dados = null;
     }

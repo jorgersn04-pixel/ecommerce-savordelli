@@ -12,7 +12,7 @@ const sha = (s) => crypto.createHash('sha256').update(s).digest('hex');
 function cepOrigem() {
   if (env.CEP_ORIGEM) return env.CEP_ORIGEM;
   if (melhorEnvio.simulado && !env.isProd) return '01001000';
-  throw new AppError(503, 'FRETE_INDISPONIVEL', 'CEP de origem nao configurado');
+  throw new AppError(503, 'FRETE_INDISPONIVEL', 'CEP de origem não configurado');
 }
 
 /**
@@ -65,7 +65,7 @@ async function gravarCache(base, destino, opcoes) {
  * `freteGratis` zera a opcao mais barata (beneficio de cupom).
  */
 async function cotar({ cepDestino, itens, freteGratis = false }) {
-  if (itens.length === 0) throw new AppError(422, 'CARRINHO_VAZIO', 'Nao ha itens para cotar');
+  if (itens.length === 0) throw new AppError(422, 'CARRINHO_VAZIO', 'Não há itens para cotar');
   const origem = cepOrigem();
   const produtos = paraProdutosME(itens);
   const base = chaveBase(origem, cepDestino, produtos);
@@ -76,7 +76,7 @@ async function cotar({ cepDestino, itens, freteGratis = false }) {
   if (opcoes.length === 0) {
     opcoes = await melhorEnvio.cotar({ cepOrigem: origem, cepDestino, produtos });
     if (opcoes.length === 0) {
-      throw new AppError(422, 'FRETE_SEM_OPCOES', 'Nenhuma opcao de entrega disponivel para este CEP');
+      throw new AppError(422, 'FRETE_SEM_OPCOES', 'Nenhuma opção de entrega disponível para este CEP');
     }
     await gravarCache(base, cepDestino, opcoes);
   }
@@ -95,7 +95,7 @@ async function cotar({ cepDestino, itens, freteGratis = false }) {
 async function cotarServico({ cepDestino, itens, servico, freteGratis }) {
   const opcoes = await cotar({ cepDestino, itens, freteGratis });
   const escolhida = opcoes.find((o) => o.codigo === String(servico));
-  if (!escolhida) throw new AppError(422, 'FRETE_SERVICO_INVALIDO', 'Servico de entrega indisponivel para este pedido');
+  if (!escolhida) throw new AppError(422, 'FRETE_SERVICO_INVALIDO', 'Serviço de entrega indisponível para este pedido');
   return escolhida;
 }
 

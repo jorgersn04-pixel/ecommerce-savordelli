@@ -6,14 +6,14 @@ const env = require('../config/env');
 const AppError = require('../utils/AppError');
 
 function notFound(req, _res, next) {
-  next(new AppError(404, 'ROTA_NAO_ENCONTRADA', `Rota nao encontrada: ${req.method} ${req.path}`));
+  next(new AppError(404, 'ROTA_NAO_ENCONTRADA', `Rota não encontrada: ${req.method} ${req.path}`));
 }
 
 // eslint-disable-next-line no-unused-vars
 function errorHandler(err, req, res, _next) {
   if (err instanceof ZodError) {
     return res.status(400).json({
-      erro: { codigo: 'VALIDACAO', mensagem: 'Dados invalidos', detalhes: err.issues },
+      erro: { codigo: 'VALIDACAO', mensagem: 'Dados inválidos', detalhes: err.issues },
     });
   }
   if (err.type === 'entity.parse.failed') {

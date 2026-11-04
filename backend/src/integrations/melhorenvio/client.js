@@ -19,7 +19,7 @@ const simulado = !env.MELHOR_ENVIO_TOKEN;
 function exigirConfiguracao() {
   if (!simulado) return;
   if (env.isProd) {
-    throw new AppError(503, 'FRETE_INDISPONIVEL', 'Cotacao de frete nao configurada');
+    throw new AppError(503, 'FRETE_INDISPONIVEL', 'Cotação de frete não configurada');
   }
 }
 
@@ -74,13 +74,13 @@ async function cotar({ cepOrigem, cepDestino, produtos }) {
 
   if (r.status === 401 || r.status === 403) {
     logger.error({ status: r.status }, 'Melhor Envio: token rejeitado');
-    throw new AppError(502, 'FRETE_INDISPONIVEL', 'Cotacao de frete indisponivel no momento');
+    throw new AppError(502, 'FRETE_INDISPONIVEL', 'Cotação de frete indisponível no momento');
   }
   if (r.status === 422) {
-    throw new AppError(422, 'FRETE_DADOS_INVALIDOS', 'Nao foi possivel cotar o frete para este CEP/itens');
+    throw new AppError(422, 'FRETE_DADOS_INVALIDOS', 'Não foi possível cotar o frete para este CEP/itens');
   }
   if (!r.ok || !Array.isArray(r.json)) {
-    throw new AppError(502, 'FRETE_INDISPONIVEL', 'Cotacao de frete indisponivel no momento');
+    throw new AppError(502, 'FRETE_INDISPONIVEL', 'Cotação de frete indisponível no momento');
   }
 
   return r.json

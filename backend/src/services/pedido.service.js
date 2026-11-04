@@ -38,13 +38,13 @@ function nomeDoItem(l) {
 async function criar(req, res, dados) {
   const clienteId = req.usuario.id;
   const carrinho = await carrinhoService.resolver(req, res);
-  if (!carrinho) throw new AppError(422, 'CARRINHO_VAZIO', 'Carrinho vazio');
+  if (!carrinho) throw new AppError(422, 'CARRINHO_VAZIO', 'Sacola vazia');
 
   const itens = carrinhoService.montarItens(await carrinhoRepo.itens(pool, carrinho.id));
-  if (itens.length === 0) throw new AppError(422, 'CARRINHO_VAZIO', 'Carrinho vazio');
+  if (itens.length === 0) throw new AppError(422, 'CARRINHO_VAZIO', 'Sacola vazia');
   const problema = itens.find((i) => i.problema);
   if (problema) {
-    throw new AppError(409, 'ITENS_INDISPONIVEIS', 'Ha itens indisponiveis no carrinho', {
+    throw new AppError(409, 'ITENS_INDISPONIVEIS', 'Há itens indisponíveis no carrinho', {
       variacao_id: problema.variacao_id, problema: problema.problema,
     });
   }
@@ -81,14 +81,14 @@ async function criar(req, res, dados) {
 
     // Serializa checkouts concorrentes do mesmo carrinho (duplo clique).
     const [[cart]] = await conn.execute('SELECT status FROM carrinhos WHERE id = ? FOR UPDATE', [carrinho.id]);
-    if (!cart || cart.status !== 'aberto') throw new AppError(409, 'CARRINHO_JA_PROCESSADO', 'Este carrinho ja foi finalizado');
+    if (!cart || cart.status !== 'aberto') throw new AppError(409, 'CARRINHO_JA_PROCESSADO', 'Esta sacola já foi finalizada');
 
     // Trava e reserva estoque; depois relê os precos sob o lock e confere com o que foi exibido.
     const reservas = await estoque.reservar(conn, itens.map((i) => ({ variacaoId: i.variacao_id, quantidade: i.quantidade })));
     const atuais = carrinhoService.montarItens(await carrinhoRepo.itens(conn, carrinho.id));
     const subtotalCent = atuais.reduce((s, i) => s + paraCentavos(i.preco_unitario) * i.quantidade, 0);
     if (subtotalCent !== paraCentavos(resumo.subtotal)) {
-      throw new AppError(409, 'PRECO_ALTERADO', 'Os precos foram atualizados. Revise o carrinho');
+      throw new AppError(409, 'PRECO_ALTERADO', 'Os preços foram atualizados. Revise a sacola');
     }
 
     let descontoCent = 0;
@@ -96,7 +96,7 @@ async function criar(req, res, dados) {
     if (dados.cupom) {
       const v = await cupons.validar(dados.cupom, subtotalCent, { exec: conn, travar: true });
       if (v.descontoCent !== paraCentavos(resumo.desconto) || v.freteGratis !== resumo.frete_gratis) {
-        throw new AppError(409, 'CUPOM_ALTERADO', 'O cupom foi alterado. Revise o carrinho');
+        throw new AppError(409, 'CUPOM_ALTERADO', 'O cupom foi alterado. Revise a sacola');
       }
       await cupons.consumir(conn, v.cupom.id);
       descontoCent = v.descontoCent;
@@ -181,7 +181,7 @@ async function montarDetalhe(pedido, { admin = false } = {}) {
 
 async function detalhar(numero, clienteId) {
   const pedido = await repo.buscarPorNumero(pool, numero, clienteId);
-  if (!pedido) throw new AppError(404, 'PEDIDO_NAO_ENCONTRADO', 'Pedido nao encontrado');
+  if (!pedido) throw new AppError(404, 'PEDIDO_NAO_ENCONTRADO', 'Pedido não encontrado');
   return montarDetalhe(pedido);
 }
 
@@ -195,14 +195,14 @@ async function listarDoCliente(clienteId, filtros) {
 
 async function pagarPedido(numero, clienteId, dadosPagamento) {
   const pedido = await repo.buscarPorNumero(pool, numero, clienteId);
-  if (!pedido) throw new AppError(404, 'PEDIDO_NAO_ENCONTRADO', 'Pedido nao encontrado');
+  if (!pedido) throw new AppError(404, 'PEDIDO_NAO_ENCONTRADO', 'Pedido não encontrado');
   const pagamento = await pagamentos.pagar(pedido, dadosPagamento);
   return { pedido: await detalhar(numero, clienteId), pagamento };
 }
 
 async function pagamentoDoPedido(numero, clienteId) {
   const pedido = await repo.buscarPorNumero(pool, numero, clienteId);
-  if (!pedido) throw new AppError(404, 'PEDIDO_NAO_ENCONTRADO', 'Pedido nao encontrado');
+  if (!pedido) throw new AppError(404, 'PEDIDO_NAO_ENCONTRADO', 'Pedido não encontrado');
   return { status_pedido: (await repo.buscarPorId(pool, pedido.id)).status, pagamento: await pagamentos.situacaoAtual(pedido) };
 }
 
@@ -228,11 +228,11 @@ async function cancelarAguardando(conn, pedidoId, autor, observacao) {
 
 async function cancelarPeloCliente(numero, clienteId) {
   const pedido = await repo.buscarPorNumero(pool, numero, clienteId);
-  if (!pedido) throw new AppError(404, 'PEDIDO_NAO_ENCONTRADO', 'Pedido nao encontrado');
+  if (!pedido) throw new AppError(404, 'PEDIDO_NAO_ENCONTRADO', 'Pedido não encontrado');
   const transacoes = await withTransaction((conn) =>
     cancelarAguardando(conn, pedido.id, `cliente:${clienteId}`, 'Cancelado pelo cliente'));
   if (transacoes === null) {
-    throw new AppError(409, 'PEDIDO_NAO_CANCELAVEL', 'So e possivel cancelar pedidos que aguardam pagamento');
+    throw new AppError(409, 'PEDIDO_NAO_CANCELAVEL', 'Só é possível cancelar pedidos que aguardam pagamento');
   }
   for (const t of transacoes) gateway.cancelarPagamento(t);
   return detalhar(numero, clienteId);
@@ -279,7 +279,7 @@ async function listarAdmin(filtros) {
 
 async function detalharAdmin(req, id) {
   const pedido = await repo.buscarPorId(pool, id);
-  if (!pedido) throw new AppError(404, 'PEDIDO_NAO_ENCONTRADO', 'Pedido nao encontrado');
+  if (!pedido) throw new AppError(404, 'PEDIDO_NAO_ENCONTRADO', 'Pedido não encontrado');
   await auditar(null, req, 'pedido.visualizar', 'pedido', id); // acesso a dados pessoais do titular
   return montarDetalhe(pedido, { admin: true });
 }
@@ -288,7 +288,7 @@ async function atualizarStatusAdmin(req, id, { status, observacao, codigo_rastre
   let transacoes = [];
   await withTransaction(async (conn) => {
     const pedido = await repo.buscarPorId(conn, id, true);
-    if (!pedido) throw new AppError(404, 'PEDIDO_NAO_ENCONTRADO', 'Pedido nao encontrado');
+    if (!pedido) throw new AppError(404, 'PEDIDO_NAO_ENCONTRADO', 'Pedido não encontrado');
     if (!TRANSICOES[pedido.status].includes(status)) {
       throw new AppError(409, 'TRANSICAO_INVALIDA', `Nao e possivel ir de "${pedido.status}" para "${status}"`, {
         permitidas: TRANSICOES[pedido.status],

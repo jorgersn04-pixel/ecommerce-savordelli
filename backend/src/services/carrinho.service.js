@@ -132,10 +132,10 @@ async function visualizarCarrinho(carrinho, cupomCodigo) {
 
 async function validarAdicao(variacaoId, quantidadeFinal) {
   if (quantidadeFinal > MAX_POR_ITEM) {
-    throw new AppError(422, 'QUANTIDADE_MAXIMA', `Maximo de ${MAX_POR_ITEM} unidades por item`);
+    throw new AppError(422, 'QUANTIDADE_MAXIMA', `Máximo de ${MAX_POR_ITEM} unidades por item`);
   }
   const v = await repo.buscarVariacaoVendavel(variacaoId);
-  if (!v) throw new AppError(404, 'VARIACAO_INDISPONIVEL', 'Produto indisponivel');
+  if (!v) throw new AppError(404, 'VARIACAO_INDISPONIVEL', 'Produto indisponível');
   if (v.disponivel < quantidadeFinal) {
     throw new AppError(409, 'ESTOQUE_INSUFICIENTE', 'Estoque insuficiente', { disponivel: v.disponivel });
   }
@@ -151,9 +151,9 @@ async function adicionarItem(req, res, { variacao_id: variacaoId, quantidade }) 
 
 async function definirItem(req, res, variacaoId, quantidade) {
   const carrinho = await resolver(req, res);
-  if (!carrinho) throw new AppError(404, 'ITEM_NAO_ENCONTRADO', 'Item nao esta no carrinho');
+  if (!carrinho) throw new AppError(404, 'ITEM_NAO_ENCONTRADO', 'Item não está no carrinho');
   if ((await repo.quantidadeAtual(carrinho.id, variacaoId)) === 0) {
-    throw new AppError(404, 'ITEM_NAO_ENCONTRADO', 'Item nao esta no carrinho');
+    throw new AppError(404, 'ITEM_NAO_ENCONTRADO', 'Item não está no carrinho');
   }
   if (quantidade === 0) await repo.remover(carrinho.id, variacaoId);
   else {
@@ -202,7 +202,7 @@ async function cotarAvulso({ cep, itens }) {
         WHERE v.id = ? AND v.ativo = 1 AND p.status = 'ativo' AND p.excluido_em IS NULL`,
       [it.quantidade, it.variacao_id],
     );
-    if (!rows[0]) throw new AppError(404, 'VARIACAO_INDISPONIVEL', 'Produto indisponivel');
+    if (!rows[0]) throw new AppError(404, 'VARIACAO_INDISPONIVEL', 'Produto indisponível');
     const r = rows[0];
     linhas.push({
       variacaoId: r.variacao_id, quantidade: it.quantidade, pesoG: r.peso_g, alturaCm: r.altura_cm,

@@ -79,7 +79,7 @@ async function aplicarStatus(pagamentoId, novoStatus, { pagoEm = null, autor = '
 /** Cria a tentativa de pagamento do pedido e processa no gateway. */
 async function pagar(pedido, dados) {
   if (pedido.status !== 'aguardando_pagamento') {
-    throw new AppError(409, 'PEDIDO_NAO_PAGAVEL', 'Este pedido nao esta aguardando pagamento');
+    throw new AppError(409, 'PEDIDO_NAO_PAGAVEL', 'Este pedido não está aguardando pagamento');
   }
   const parcelas = dados.metodo === 'cartao_credito' ? dados.parcelas : 1;
 
@@ -130,7 +130,7 @@ async function pagar(pedido, dados) {
     metodo: dados.metodo,
     status: pg.status,
     parcelas,
-    mensagem: pg.status === 'recusado' ? 'Pagamento recusado. Tente outro cartao ou outra forma de pagamento' : null,
+    mensagem: pg.status === 'recusado' ? 'Pagamento recusado. Tente outro cartão ou outra forma de pagamento' : null,
     pix: resultado.pix,
     boleto: resultado.boleto,
     expira_em: resultado.expiraEm,

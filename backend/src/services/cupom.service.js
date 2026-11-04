@@ -17,14 +17,14 @@ async function validar(codigo, subtotalCent, { exec = pool, travar = false } = {
     [String(codigo).trim()],
   );
   const c = rows[0];
-  if (!c || !c.ativo) throw invalido('Cupom invalido');
+  if (!c || !c.ativo) throw invalido('Cupom inválido');
 
   const agora = new Date();
-  if (c.valido_de && new Date(c.valido_de) > agora) throw invalido('Cupom ainda nao esta valido');
+  if (c.valido_de && new Date(c.valido_de) > agora) throw invalido('Cupom ainda não está válido');
   if (c.valido_ate && new Date(c.valido_ate) < agora) throw invalido('Cupom expirado');
   if (c.limite_usos !== null && c.usos >= c.limite_usos) throw invalido('Cupom esgotado');
   if (c.pedido_minimo !== null && subtotalCent < paraCentavos(c.pedido_minimo)) {
-    throw invalido(`Pedido minimo de R$ ${Number(c.pedido_minimo).toFixed(2).replace('.', ',')} para este cupom`);
+    throw invalido(`Pedido mínimo de R$ ${Number(c.pedido_minimo).toFixed(2).replace('.', ',')} para este cupom`);
   }
 
   let descontoCent = 0;

@@ -80,7 +80,7 @@ test('carrinho, cupom e frete (integracao)', { skip: !habilitado && 'defina SV_T
     assert.equal(r.body.total_produtos, '90.00');
     r = await api('GET', '/carrinho?cupom=min500', { cookie });
     assert.equal(r.body.cupom.valido, false);
-    assert.match(r.body.cupom.motivo, /minimo/i);
+    assert.match(r.body.cupom.motivo, /m[ií]nimo/i);
     r = await api('GET', '/carrinho?cupom=NAOEXISTE', { cookie });
     assert.equal(r.body.cupom.valido, false);
     assert.equal(r.body.desconto, '0.00');

@@ -40,7 +40,7 @@ async function registrar(dados, { ip, userAgent }) {
   } catch (err) {
     if (err.code === 'ER_DUP_ENTRY') {
       const campo = /cpf_hash/.test(err.message) ? 'CPF' : 'e-mail';
-      throw new AppError(409, 'CADASTRO_DUPLICADO', `Ja existe um cadastro com este ${campo}`);
+      throw new AppError(409, 'CADASTRO_DUPLICADO', `Já existe um cadastro com este ${campo}`);
     }
     throw err;
   }
@@ -55,7 +55,7 @@ async function obterPerfil(clienteId) {
     'SELECT id, nome, email, cpf_cifrado, telefone, data_nascimento, email_verificado_em, criado_em FROM clientes WHERE id = ? AND anonimizado_em IS NULL',
     [clienteId],
   );
-  if (!c) throw new AppError(404, 'CLIENTE_NAO_ENCONTRADO', 'Cliente nao encontrado');
+  if (!c) throw new AppError(404, 'CLIENTE_NAO_ENCONTRADO', 'Cliente não encontrado');
   const { cpf_cifrado: cifrado, ...resto } = c;
   return { ...resto, cpf: cifrado ? mascararCpf(decifrar(cifrado)) : null };
 }
@@ -80,7 +80,7 @@ async function listarEnderecos(clienteId) {
 
 async function buscarEndereco(exec, clienteId, id) {
   const [rows] = await exec.execute('SELECT * FROM enderecos WHERE id = ? AND cliente_id = ?', [id, clienteId]);
-  if (!rows[0]) throw new AppError(404, 'ENDERECO_NAO_ENCONTRADO', 'Endereco nao encontrado');
+  if (!rows[0]) throw new AppError(404, 'ENDERECO_NAO_ENCONTRADO', 'Endereço não encontrado');
   return rows[0];
 }
 
@@ -90,7 +90,7 @@ const valores = (e) => CAMPOS.map((c) => e[c] ?? null);
 async function criarEndereco(clienteId, e) {
   return withTransaction(async (conn) => {
     const [[{ n }]] = await conn.execute('SELECT COUNT(*) AS n FROM enderecos WHERE cliente_id = ? FOR UPDATE', [clienteId]);
-    if (Number(n) >= MAX_ENDERECOS) throw new AppError(422, 'LIMITE_ENDERECOS', `Limite de ${MAX_ENDERECOS} enderecos`);
+    if (Number(n) >= MAX_ENDERECOS) throw new AppError(422, 'LIMITE_ENDERECOS', `Limite de ${MAX_ENDERECOS} endereços`);
     const padrao = e.padrao || Number(n) === 0;
     if (padrao) await conn.execute('UPDATE enderecos SET padrao = 0 WHERE cliente_id = ?', [clienteId]);
     const [r] = await conn.execute(

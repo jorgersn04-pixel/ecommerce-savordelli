@@ -9,8 +9,8 @@ const router = Router();
 
 // Cotacao chama API externa: limite proprio por IP.
 const limiteFrete = rateLimit({
-  windowMs: 60_000, limit: 30, standardHeaders: 'draft-7', legacyHeaders: false,
-  message: { erro: { codigo: 'MUITAS_TENTATIVAS', mensagem: 'Muitas cotacoes. Aguarde um instante' } },
+  windowMs: 60_000, limit: 60, standardHeaders: 'draft-7', legacyHeaders: false,
+  message: { erro: { codigo: 'MUITAS_TENTATIVAS', mensagem: 'Muitas cotações. Aguarde um instante' } },
 });
 
 // Carrinho: anonimo (cookie) ou cliente logado (Bearer opcional).

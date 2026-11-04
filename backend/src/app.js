@@ -43,17 +43,20 @@ app.use(
     credentials: true,
   }),
 );
-app.use(rateLimit({ windowMs: 60_000, limit: 300, standardHeaders: 'draft-7', legacyHeaders: false }));
-// rawBody: necessario para validar a assinatura HMAC dos webhooks (Bling).
-app.use(express.json({ limit: '1mb', verify: (req, _res, buf) => { req.rawBody = buf; } }));
-app.use(cookieParser());
-
+// Arquivos estaticos (painel e vitrine) ficam ANTES do limitador: cada pagina carrega dezenas de arquivos e
+// nao devem consumir a cota de requisicoes da API.
 // Painel administrativo (HTML/CSS/JS estaticos), mesmo dominio da API: sem CORS e com cookie de refresh restrito.
 app.use('/painel', express.static(path.resolve(__dirname, '../../frontend/admin'), { index: 'index.html', maxAge: env.isProd ? '1h' : 0 }));
 
 // Vitrine publica (HTML/CSS/JS estaticos). A raiz redireciona para a loja.
 app.use('/loja', express.static(path.resolve(__dirname, '../../frontend/loja'), { index: 'index.html', maxAge: env.isProd ? '1h' : 0 }));
 app.get('/', (_req, res) => res.redirect('/loja/'));
+
+app.use(rateLimit({ windowMs: 60_000, limit: 300, standardHeaders: 'draft-7', legacyHeaders: false }));
+// rawBody: necessario para validar a assinatura HMAC dos webhooks (Bling).
+app.use(express.json({ limit: '1mb', verify: (req, _res, buf) => { req.rawBody = buf; } }));
+app.use(cookieParser());
+
 
 app.use(routes);
 

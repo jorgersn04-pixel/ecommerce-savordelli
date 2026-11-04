@@ -99,3 +99,6 @@ select {
   *::before,
   *::after { animation: none !important; transition: none !important; }
 }
+
+/* Header fixo: rolagem por ancora ou foco por teclado nao pode deixar o elemento escondido atras dele. */
+html { scroll-padding-top: 150px; }

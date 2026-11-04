@@ -160,3 +160,9 @@
   html:has(body.com-barra-fluxo),
   html:has(body.com-barra) { scroll-padding-bottom: 128px; }
 }
+
+/* Identificacao */
+.auth-centro { width: min(560px, 100%); margin: 0 auto; padding: 8px 0 56px; display: grid; gap: 18px; }
+.muted-texto { color: var(--cor-texto-2); }
+.abas.duas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.abas.duas .aba { flex-direction: row; justify-content: center; min-height: 52px; }

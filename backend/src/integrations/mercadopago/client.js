@@ -13,7 +13,7 @@ const simulado = !env.MERCADOPAGO_ACCESS_TOKEN;
 const mock = new Map();
 
 function exigirConfiguracao() {
-  if (simulado && env.isProd) throw new AppError(503, 'PAGAMENTO_INDISPONIVEL', 'Pagamentos nao configurados');
+  if (simulado && env.isProd) throw new AppError(503, 'PAGAMENTO_INDISPONIVEL', 'Pagamentos não configurados');
 }
 
 /** Status do Mercado Pago -> status interno da tabela pagamentos. */
@@ -58,12 +58,12 @@ const headers = (extra = {}) => ({ Authorization: `Bearer ${env.MERCADOPAGO_ACCE
 function erroHttp(r) {
   if (r.status === 400 || r.status === 422) {
     logger.warn({ status: r.status, causa: r.json?.cause?.map((c) => c.code) }, 'Mercado Pago recusou a requisicao');
-    return new AppError(422, 'PAGAMENTO_INVALIDO', 'Nao foi possivel processar o pagamento. Verifique os dados informados');
+    return new AppError(422, 'PAGAMENTO_INVALIDO', 'Não foi possível processar o pagamento. Verifique os dados informados');
   }
   if (r.status === 401 || r.status === 403) {
     logger.error({ status: r.status }, 'Mercado Pago: credencial rejeitada');
   }
-  return new AppError(502, 'PAGAMENTO_INDISPONIVEL', 'Pagamento indisponivel no momento. Tente novamente');
+  return new AppError(502, 'PAGAMENTO_INDISPONIVEL', 'Pagamento indisponível no momento. Tente novamente');
 }
 
 /**
