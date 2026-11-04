@@ -14,5 +14,6 @@ router.get('/me', (req, res) => {
 
 router.use(require('./admin.catalogo.routes'));
 router.use(require('./admin.cupons.routes'));
+router.use(require('./admin.pedidos.routes'));
 
 module.exports = router;

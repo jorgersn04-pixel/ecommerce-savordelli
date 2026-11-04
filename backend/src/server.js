@@ -14,6 +14,8 @@ async function main() {
     logger.error({ err }, 'MySQL indisponivel na inicializacao');
   }
 
+  require('./jobs/expirarPedidos').iniciar();
+
   const server = app.listen(env.PORT, () => {
     logger.info(`API Savordelli em http://localhost:${env.PORT} (${env.NODE_ENV})`);
   });

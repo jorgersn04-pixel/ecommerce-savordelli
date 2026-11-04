@@ -54,12 +54,13 @@ async function aplicarSaldoBling(variacaoId, saldo) {
 }
 
 /**
- * Reserva itens de um pedido dentro da transacao do checkout.
- * itens: [{ variacaoId, quantidade }]. Trava as linhas em ordem de id (evita deadlock).
- * Retorna { variacaoId -> linha travada } para o chamador reutilizar.
+ * Trava e reserva os itens dentro da transacao do checkout (ordem de id evita deadlock).
+ * itens: [{ variacaoId, quantidade }]. Devolve os dados para registrarReservas(), chamado
+ * depois que o pedido existe (a movimentacao precisa do pedido_id).
  */
-async function reservar(conn, itens, pedidoId) {
+async function reservar(conn, itens) {
   const ordenados = [...itens].sort((a, b) => Number(a.variacaoId) - Number(b.variacaoId));
+  const reservas = [];
   for (const it of ordenados) {
     const v = await travarVariacao(conn, it.variacaoId);
     const livre = v.estoque_disponivel - v.estoque_reservado;
@@ -69,10 +70,14 @@ async function reservar(conn, itens, pedidoId) {
       });
     }
     await conn.execute('UPDATE produto_variacoes SET estoque_reservado = estoque_reservado + ? WHERE id = ?', [it.quantidade, it.variacaoId]);
-    await registrar(conn, {
-      variacaoId: it.variacaoId, tipo: 'reserva', quantidade: it.quantidade,
-      saldoApos: v.estoque_disponivel, pedidoId, origem: 'loja',
-    });
+    reservas.push({ variacaoId: it.variacaoId, quantidade: it.quantidade, saldoApos: v.estoque_disponivel });
+  }
+  return reservas;
+}
+
+async function registrarReservas(conn, reservas, pedidoId) {
+  for (const r of reservas) {
+    await registrar(conn, { variacaoId: r.variacaoId, tipo: 'reserva', quantidade: r.quantidade, saldoApos: r.saldoApos, pedidoId, origem: 'loja' });
   }
 }
 
@@ -112,4 +117,16 @@ async function baixarReserva(conn, pedidoId) {
   }
 }
 
-module.exports = { ajustarSaldoAdmin, aplicarSaldoBling, reservar, liberarReserva, baixarReserva };
+/** Cancelamento de pedido ja pago/baixado: o saldo volta para disponivel. */
+async function devolverAoEstoque(conn, pedidoId, origem = 'admin') {
+  for (const it of await itensDoPedido(conn, pedidoId)) {
+    const v = await travarVariacao(conn, it.variacao_id);
+    const novoSaldo = v.estoque_disponivel + it.quantidade;
+    await conn.execute('UPDATE produto_variacoes SET estoque_disponivel = ? WHERE id = ?', [novoSaldo, it.variacao_id]);
+    await registrar(conn, {
+      variacaoId: it.variacao_id, tipo: 'entrada', quantidade: it.quantidade, saldoApos: novoSaldo, pedidoId, origem,
+    });
+  }
+}
+
+module.exports = { ajustarSaldoAdmin, aplicarSaldoBling, reservar, registrarReservas, liberarReserva, baixarReserva, devolverAoEstoque };
