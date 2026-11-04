@@ -29,6 +29,10 @@ app.use(
         // Google Fonts (Cormorant Garamond e Nunito Sans) usados pela vitrine.
         'style-src': ["'self'", 'https://fonts.googleapis.com'],
         'font-src': ["'self'", 'https://fonts.gstatic.com'],
+        // Checkout transparente: SDK e campos seguros do Mercado Pago (so carregados no modo real).
+        'script-src': ["'self'", 'https://sdk.mercadopago.com', 'https://http2.mlstatic.com'],
+        'connect-src': ["'self'", 'https://api.mercadopago.com', 'https://*.mercadopago.com', 'https://*.mercadolibre.com'],
+        'frame-src': ["'self'", 'https://*.mercadopago.com', 'https://*.mercadolibre.com'],
       },
     },
   }),

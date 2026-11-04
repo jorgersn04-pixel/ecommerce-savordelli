@@ -75,3 +75,12 @@ Paginas: `index.html` (home, busca e listagem por categoria) e `produto.html?slu
 `css/tokens.css` (variaveis `:root`). Regras de conversao: um unico botao ouro por tela; barra fixa de compra no mobile; faixa de
 confianca junto ao botao. Enquanto o catalogo estiver vazio (ou a API fora do ar) a vitrine exibe produtos de demonstracao
 (`js/mock.js`); desligue com `DEMO_SE_VAZIO: false` em `js/config.js`.
+
+### Fluxo de compra (vitrine)
+
+`produto.html` -> `sacola.html` (itens, quantidade, cupom, frete) -> `identificacao.html` (login/cadastro com CPF e consentimentos
+LGPD) -> `checkout.html` (endereco, entrega, Pix / cartao / boleto). Marcas revendidas: `database/seeds/001_marcas.sql`.
+
+Pagamento: sem `MERCADOPAGO_ACCESS_TOKEN` (fora de producao) o gateway e SIMULADO e o checkout mostra um botao "Simular pagamento
+aprovado" para Pix/boleto; use o cartao 4000 0000 0000 0002 para simular recusa. Com credenciais, defina tambem
+`MERCADOPAGO_PUBLIC_KEY` (campos seguros do cartao; o numero do cartao nunca passa pelo servidor da loja).

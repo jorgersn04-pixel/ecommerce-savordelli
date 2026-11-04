@@ -12,6 +12,7 @@ const ICONES = {
   cartao: [['rect', { x: 2, y: 5, width: 20, height: 14, rx: 2 }], ['path', { d: 'M2 10h20M6 15h4' }]],
   original: [['path', { d: 'M12 2 4 5v6c0 5 3.4 9.3 8 11 4.6-1.7 8-6 8-11V5z' }], ['path', { d: 'm8.5 12 2.5 2.5 4.5-5' }]],
   caminhao: [['path', { d: 'M1 4h13v12H1zM14 8h4l4 4v4h-8' }], ['circle', { cx: 6, cy: 18, r: 2 }], ['circle', { cx: 18, cy: 18, r: 2 }]],
+  check: [['path', { d: 'm5 12.5 4.5 4.5L19 7.5' }]],
   menos: [['path', { d: 'M5 12h14' }]],
   mais: [['path', { d: 'M12 5v14M5 12h14' }]],
 };

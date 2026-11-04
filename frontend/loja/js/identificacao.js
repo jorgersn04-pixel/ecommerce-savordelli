@@ -24,6 +24,8 @@ function campoTexto({ nome, rotulo, tipo = 'text', autocomplete, dica, inputmode
   const input = h('input', { id, name: nome, type: tipo, autocomplete, inputmode, maxlength, 'aria-describedby': `${id}-msg` });
   if (mascara) input.addEventListener('input', () => { input.value = mascara(input.value); });
   const erro = h('span', { class: 'erro-campo', id: `${id}-msg`, role: 'alert' });
+  // O erro some assim que o cliente volta a digitar no campo.
+  input.addEventListener('input', () => { erro.textContent = ''; input.removeAttribute('aria-invalid'); });
   const el = h('div', { class: 'campo' }, h('label', { for: id }, rotulo, opcional ? h('span', { class: 'dica' }, ' (opcional)') : null), input, dica ? h('span', { class: 'dica' }, dica) : null, erro);
   return {
     el, input,

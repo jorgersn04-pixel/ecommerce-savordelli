@@ -64,6 +64,38 @@ test('cadastro e area do cliente (integracao)', { skip: !habilitado && 'defina S
     assert.equal(rr.status, 200);
   });
 
+  await t.test('refresh rotativo: corrida benigna tolerada, reuso real revoga tudo, id sozinho nao revoga nada', async () => {
+    const login = await api('POST', '/auth/cliente/login', { body: { email: 'maria@teste.com', senha: 'Senha1234' } });
+    const c1 = login.headers.getSetCookie()[0].split(';')[0];
+    const r2 = await api('POST', '/auth/cliente/refresh', { cookie: c1 });
+    assert.equal(r2.status, 200);
+    const c2 = r2.headers.getSetCookie()[0].split(';')[0];
+
+    // Duas paginas renovando ao mesmo tempo com o cookie antigo: nao derruba a sessao nova.
+    const corrida = await api('POST', '/auth/cliente/refresh', { cookie: c1 });
+    assert.equal(corrida.status, 401);
+    assert.equal(corrida.body.erro.codigo, 'REFRESH_CONCORRENTE');
+    const c3 = (await api('POST', '/auth/cliente/refresh', { cookie: c2 })).headers.getSetCookie()[0].split(';')[0];
+    assert.match(c3, /^sv_refresh_cliente=/, 'a sessao nova segue valida apos a corrida');
+
+    // Quem so conhece o id (sequencial) de uma sessao revogada nao consegue revogar nada.
+    const idRevogada = c1.split('=')[1].split('.')[0];
+    const sondagem = await api('POST', '/auth/cliente/refresh', { cookie: `sv_refresh_cliente=${idRevogada}.${'x'.repeat(43)}` });
+    assert.equal(sondagem.body.erro.codigo, 'REFRESH_INVALIDO');
+    assert.equal((await api('POST', '/auth/cliente/refresh', { cookie: c3 })).status, 200, 'sondagem nao afetou as sessoes ativas');
+
+    // Reuso com o segredo correto fora da janela = token vazado: todas as sessoes do cliente sao encerradas.
+    await pool.query("UPDATE sessoes_refresh SET revogado_em = UTC_TIMESTAMP() - INTERVAL 1 MINUTE WHERE revogado_em IS NOT NULL");
+    const reuso = await api('POST', '/auth/cliente/refresh', { cookie: c1 });
+    assert.equal(reuso.body.erro.codigo, 'REFRESH_REUTILIZADO');
+    const [[{ n }]] = await pool.query("SELECT COUNT(*) n FROM sessoes_refresh WHERE tipo_usuario = 'cliente' AND revogado_em IS NULL");
+    assert.equal(Number(n), 0, 'nenhuma sessao de cliente restou ativa');
+    assert.equal((await api('POST', '/auth/cliente/refresh', { cookie: c3 })).status, 401);
+    // volta ao estado esperado pelos proximos subtestes
+    const novo = await api('POST', '/auth/cliente/login', { body: { email: 'maria@teste.com', senha: 'Senha1234' } });
+    assert.equal(novo.status, 200);
+  });
+
   await t.test('perfil com CPF mascarado, sem hash de senha', async () => {
     const r = await api('GET', '/cliente/me', { token });
     assert.equal(r.status, 200);

@@ -10,6 +10,7 @@ const argon2 = require('argon2');
 const sessoes = require('../repositories/sessoes.repository');
 
 const ISSUER = 'savordelli';
+const JANELA_CORRIDA_MS = 10_000; // tolerancia a renovacoes simultaneas com o mesmo cookie
 
 /** JWT de acesso (curta duracao). Payload: sub, tipo, papel e permissoes (admin). */
 function gerarAccessToken({ id, tipo, papel = null, permissoes = [] }) {
@@ -75,12 +76,8 @@ async function rotacionarRefreshToken({ tipo, token, ip, userAgent }) {
   const sessao = await sessoes.buscarPorId(partes.id, tipo);
   if (!sessao) throw invalido();
 
-  if (sessao.revogado_em) {
-    await sessoes.revogarTodasDoUsuario(tipo, sessao.usuario_id);
-    throw new AppError(401, 'REFRESH_REUTILIZADO', 'Sessao encerrada por seguranca. Faca login novamente');
-  }
-  if (new Date(sessao.expira_em) <= new Date()) throw invalido();
-
+  // O segredo e conferido ANTES de qualquer acao: ids de sessao sao sequenciais e nao podem, sozinhos,
+  // provocar a revogacao das sessoes de outra pessoa.
   let confere = false;
   try {
     confere = await argon2.verify(sessao.token_hash, partes.segredo);
@@ -88,6 +85,18 @@ async function rotacionarRefreshToken({ tipo, token, ip, userAgent }) {
     confere = false;
   }
   if (!confere) throw invalido();
+
+  if (sessao.revogado_em) {
+    // Corrida benigna: duas abas/paginas renovaram quase ao mesmo tempo com o mesmo cookie. O cliente repete a
+    // renovacao com o cookie novo; nada e revogado.
+    if (Date.now() - new Date(sessao.revogado_em).getTime() < JANELA_CORRIDA_MS) {
+      throw new AppError(401, 'REFRESH_CONCORRENTE', 'Renovacao simultanea; tente novamente');
+    }
+    // Reuso fora da janela, com o segredo correto: token vazado. Encerra todas as sessoes do usuario.
+    await sessoes.revogarTodasDoUsuario(tipo, sessao.usuario_id);
+    throw new AppError(401, 'REFRESH_REUTILIZADO', 'Sessao encerrada por seguranca. Faca login novamente');
+  }
+  if (new Date(sessao.expira_em) <= new Date()) throw invalido();
 
   const novo = await prepararRefresh();
   const expiraEm = expiracaoRefresh();

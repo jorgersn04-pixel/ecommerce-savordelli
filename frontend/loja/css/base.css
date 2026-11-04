@@ -102,3 +102,6 @@ select {
 
 /* Header fixo: rolagem por ancora ou foco por teclado nao pode deixar o elemento escondido atras dele. */
 html { scroll-padding-top: 150px; }
+
+/* O atributo hidden deve sempre esconder, mesmo em elementos com display definido (grid/flex). */
+[hidden] { display: none !important; }

@@ -34,6 +34,7 @@ const schema = z.object({
 
   // Pagamentos (Mercado Pago). Sem token em dev/test usa gateway simulado; em producao e obrigatorio.
   MERCADOPAGO_ACCESS_TOKEN: z.string().optional(),
+  MERCADOPAGO_PUBLIC_KEY: z.string().optional(),
   MERCADOPAGO_WEBHOOK_SECRET: z.string().optional(),
   API_PUBLIC_URL: z.string().url().optional(),
 

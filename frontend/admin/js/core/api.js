@@ -54,7 +54,12 @@ async function enviar(metodo, caminho, corpo) {
 /** Renova o access token a partir do cookie de refresh. Chamadas simultaneas compartilham a mesma renovacao. */
 export function renovar() {
   renovando ??= (async () => {
-    const r = await enviar('POST', '/auth/admin/refresh');
+    let r = await enviar('POST', '/auth/admin/refresh');
+    if (!r.ok && r.dados?.erro?.codigo === 'REFRESH_CONCORRENTE') {
+      // Outra pagina renovou ao mesmo tempo; o cookie novo ja foi gravado: tenta de novo uma vez.
+      await new Promise((ok) => setTimeout(ok, 500));
+      r = await enviar('POST', '/auth/admin/refresh');
+    }
     if (!r.ok) {
       accessToken = null;
       return null;

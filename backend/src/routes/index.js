@@ -12,6 +12,7 @@ router.use('/catalogo', require('./catalogo.routes'));
 router.use(require('./carrinho.routes'));
 router.use('/cliente', require('./cliente.routes'));
 router.use('/pedidos', require('./pedidos.routes'));
+router.use('/pagamentos', require('./pagamentos.routes'));
 router.use('/webhooks', require('./webhooks.routes'));
 router.use('/bling', require('./bling.callback.routes'));
 
