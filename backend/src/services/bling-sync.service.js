@@ -174,6 +174,12 @@ async function processar(item) {
       return inativarProduto(item.entidade_id);
     case 'estoque:atualizar':
       return enviarEstoque(item.entidade_id, payload?.saldo);
+    case 'contato:atualizar':
+      if (payload?.anonimizar && payload.bling_contato_id) {
+        await bling.anonimizarContato(payload.bling_contato_id);
+        return `contato ${payload.bling_contato_id} anonimizado no Bling`;
+      }
+      return 'atualizacao de contato sem acao';
     case 'pedido:criar':
       return enviarPedido(item.entidade_id);
     case 'pedido:atualizar':

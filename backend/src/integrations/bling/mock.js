@@ -19,6 +19,7 @@ function reiniciar() {
   estado.saldos.clear();
   estado.contatos.clear();
   estado.pedidos.length = 0;
+  estado.contatosAnonimizados = [];
   estado.chamadas.length = 0;
   estado.falhas.length = 0;
 }
@@ -80,6 +81,11 @@ async function criarContato(payload) {
   estado.contatos.set(payload.numeroDocumento, id);
   return id;
 }
+async function anonimizarContato(id) {
+  entrar('anonimizarContato', { id });
+  for (const [doc, cid] of estado.contatos) if (cid === String(id)) estado.contatos.delete(doc);
+  estado.contatosAnonimizados = [...(estado.contatosAnonimizados || []), String(id)];
+}
 async function criarPedidoVenda(payload) {
   entrar('criarPedidoVenda', payload);
   const id = novoId();
@@ -92,5 +98,5 @@ module.exports = {
   estado, reiniciar, injetarFalha,
   buscarProdutoPorCodigo, criarProduto, atualizarProduto, inativarProduto,
   lancarSaldo, saldos,
-  buscarContatoPorDocumento, criarContato, criarPedidoVenda,
+  buscarContatoPorDocumento, criarContato, anonimizarContato, criarPedidoVenda,
 };

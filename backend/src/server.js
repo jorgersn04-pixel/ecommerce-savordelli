@@ -16,6 +16,7 @@ async function main() {
 
   require('./jobs/expirarPedidos').iniciar();
   require('./jobs/blingWorker').iniciar();
+  require('./jobs/lgpd').iniciar();
 
   const server = app.listen(env.PORT, () => {
     logger.info(`API Savordelli em http://localhost:${env.PORT} (${env.NODE_ENV})`);

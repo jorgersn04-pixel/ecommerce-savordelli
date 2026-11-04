@@ -49,3 +49,15 @@ Fila (`bling_sync_fila`) consumida pelo worker (`backend/src/jobs/blingWorker.js
 `POST /webhooks/bling`; reconciliacao de estoque a cada 6 horas. Cada variacao (SKU) vira um produto simples no
 Bling, casado pelo codigo. Variaveis: `BLING_CLIENT_ID`, `BLING_CLIENT_SECRET`, `BLING_REDIRECT_URI`, `BLING_DEPOSITO_ID`.
 Conexao OAuth2 pelo painel (Integracao Bling > Conectar). Sem credenciais, fora de producao, usa um Bling simulado.
+
+## LGPD
+
+Direitos do titular implementados em `backend/src/services/lgpd.service.js`:
+
+- Acesso e portabilidade: `GET /cliente/lgpd/exportar` (JSON completo, sem hashes ou segredos).
+- Consentimento: `GET/PUT /cliente/lgpd/consentimentos` (registro append-only; revogacao gera solicitacao concluida).
+- Solicitacoes com prazo de 15 dias: `GET/POST /cliente/lgpd/solicitacoes`; fila e tratamento em `/admin/lgpd/solicitacoes` (permissao `lgpd.gerenciar`).
+- Eliminacao: `POST /cliente/lgpd/anonimizar` (senha + confirmacao) ou `POST /admin/lgpd/clientes/:id/anonimizar`. Anonimiza o cadastro,
+  apaga enderecos e carrinho, revoga sessoes. Bloqueia se houver pedido em andamento.
+- Guarda fiscal: pedidos pagos mantem nome, CPF (cifrado) e endereco por 5 anos (art. 16, I); depois um job diario apaga esses snapshots.
+  Pedidos nunca pagos tem os snapshots apagados na hora. A prova de consentimento e preservada.

@@ -9,7 +9,7 @@ async function auditar(exec, req, acao, entidade, entidadeId = null, detalhes = 
     `INSERT INTO logs_auditoria (admin_id, acao, entidade, entidade_id, detalhes, ip_hash)
      VALUES (?, ?, ?, ?, ?, ?)`,
     [
-      req.usuario?.id ?? null,
+      req.usuario?.tipo === 'admin' ? req.usuario.id : null, // acoes do titular ficam sem admin_id
       acao,
       entidade,
       entidadeId,

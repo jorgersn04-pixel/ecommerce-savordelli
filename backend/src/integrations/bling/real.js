@@ -121,6 +121,12 @@ async function buscarContatoPorDocumento(documento) {
 async function criarContato(payload) {
   return String((await chamar('POST', '/contatos', { corpo: payload })).data.id);
 }
+/** Descaracteriza o contato no Bling (LGPD). Documentos fiscais ja emitidos seguem a guarda legal do ERP. */
+async function anonimizarContato(id) {
+  await chamar('PUT', `/contatos/${id}`, {
+    corpo: { nome: 'Cliente anonimizado', tipo: 'F', situacao: 'I', email: '', telefone: '', celular: '' },
+  });
+}
 async function criarPedidoVenda(payload) {
   return String((await chamar('POST', '/pedidos/vendas', { corpo: payload })).data.id);
 }
@@ -129,5 +135,5 @@ module.exports = {
   simulado: false,
   buscarProdutoPorCodigo, criarProduto, atualizarProduto, inativarProduto,
   lancarSaldo, saldos,
-  buscarContatoPorDocumento, criarContato, criarPedidoVenda,
+  buscarContatoPorDocumento, criarContato, anonimizarContato, criarPedidoVenda,
 };

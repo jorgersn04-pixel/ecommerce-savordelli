@@ -16,6 +16,7 @@ router.use(require('./admin.catalogo.routes'));
 router.use(require('./admin.cupons.routes'));
 router.use(require('./admin.pedidos.routes'));
 router.use(require('./admin.bling.routes'));
+router.use(require('./admin.lgpd.routes'));
 
 router.get('/dashboard', async (_req, res) => {
   res.json(await require('../services/dashboard.service').resumo());

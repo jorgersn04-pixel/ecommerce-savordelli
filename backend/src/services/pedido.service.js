@@ -75,6 +75,10 @@ async function criar(req, res, dados) {
   };
 
   const pedidoId = await withTransaction(async (conn) => {
+    // Trava compartilhada no cliente: impede anonimizacao concorrente (LGPD) no meio do checkout.
+    const [vivo] = await conn.execute('SELECT id FROM clientes WHERE id = ? AND anonimizado_em IS NULL FOR SHARE', [clienteId]);
+    if (vivo.length === 0) throw new AppError(404, 'CLIENTE_NAO_ENCONTRADO', 'Cliente nao encontrado');
+
     // Serializa checkouts concorrentes do mesmo carrinho (duplo clique).
     const [[cart]] = await conn.execute('SELECT status FROM carrinhos WHERE id = ? FOR UPDATE', [carrinho.id]);
     if (!cart || cart.status !== 'aberto') throw new AppError(409, 'CARRINHO_JA_PROCESSADO', 'Este carrinho ja foi finalizado');

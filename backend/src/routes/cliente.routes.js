@@ -9,6 +9,8 @@ const router = Router();
 // Area do cliente logado.
 router.use(autenticar('cliente'));
 
+router.use('/lgpd', require('./lgpd.routes'));
+
 router.get('/me', c.perfil);
 router.put('/me', c.atualizarPerfil);
 
