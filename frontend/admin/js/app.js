@@ -6,9 +6,11 @@ import { icone } from './core/icons.js';
 /** Itens do menu. `permissao` controla a visibilidade (o servidor reaplica a regra em toda chamada). */
 const MENU = [
   { rota: '/', rotulo: 'Visao geral', icone: 'dashboard' },
-  { rota: '/pedidos', rotulo: 'Pedidos', icone: 'pedidos', permissao: 'pedidos.ler' },
-  { rota: '/produtos', rotulo: 'Produtos', icone: 'produtos', permissao: 'produtos.ler' },
-  { rota: '/cupons', rotulo: 'Cupons', icone: 'cupons', permissao: 'cupons.ler' },
+  { rota: '/pedidos', rotulo: 'Pedidos', icone: 'pedidos', permissao: 'pedidos.ler', grupo: 'Operacao' },
+  { rota: '/produtos', rotulo: 'Produtos', icone: 'produtos', permissao: 'produtos.ler', grupo: 'Catalogo' },
+  { rota: '/marcas', rotulo: 'Marcas', icone: 'marcas', permissao: 'produtos.ler' },
+  { rota: '/categorias', rotulo: 'Categorias', icone: 'categorias', permissao: 'produtos.ler' },
+  { rota: '/cupons', rotulo: 'Cupons', icone: 'cupons', permissao: 'cupons.ler', grupo: 'Vendas' },
   { rota: '/bling', rotulo: 'Integracao Bling', icone: 'bling', permissao: 'bling.gerenciar', grupo: 'Sistema' },
 ];
 
@@ -20,6 +22,8 @@ const ROTAS = [
   { re: /^\/produtos$/, menu: '/produtos', titulo: 'Produtos', carregar: () => import('./modules/produtos.js'), fn: 'lista' },
   { re: /^\/produtos\/novo$/, menu: '/produtos', titulo: 'Novo produto', carregar: () => import('./modules/produtos.js'), fn: 'novo' },
   { re: /^\/produtos\/(\d+)$/, menu: '/produtos', titulo: 'Produto', carregar: () => import('./modules/produtos.js'), fn: 'detalhe' },
+  { re: /^\/marcas$/, menu: '/marcas', titulo: 'Marcas', carregar: () => import('./modules/marcas.js'), fn: 'render' },
+  { re: /^\/categorias$/, menu: '/categorias', titulo: 'Categorias', carregar: () => import('./modules/categorias.js'), fn: 'render' },
   { re: /^\/cupons$/, menu: '/cupons', titulo: 'Cupons', carregar: () => import('./modules/cupons.js'), fn: 'render' },
   { re: /^\/bling$/, menu: '/bling', titulo: 'Integracao Bling', carregar: () => import('./modules/bling.js'), fn: 'render' },
 ];

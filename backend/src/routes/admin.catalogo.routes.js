@@ -23,9 +23,11 @@ router.delete('/imagens/:id', perm('produtos.editar'), c.removerImagem);
 router.get('/marcas', perm('produtos.ler'), c.listarMarcas);
 router.post('/marcas', perm('produtos.criar'), c.criarMarca);
 router.put('/marcas/:id', perm('produtos.editar'), c.atualizarMarca);
+router.delete('/marcas/:id', perm('produtos.excluir'), c.removerMarca);
 
 router.get('/categorias', perm('produtos.ler'), c.listarCategorias);
 router.post('/categorias', perm('produtos.criar'), c.criarCategoria);
 router.put('/categorias/:id', perm('produtos.editar'), c.atualizarCategoria);
+router.delete('/categorias/:id', perm('produtos.excluir'), c.removerCategoria);
 
 module.exports = router;

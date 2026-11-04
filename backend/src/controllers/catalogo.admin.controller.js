@@ -56,7 +56,16 @@ module.exports = {
     res.status(204).end();
   },
 
+  async removerMarca(req, res) {
+    await s.removerMarca(req, idParams.parse(req.params).id);
+    res.status(204).end();
+  },
+
   // categorias
+  async removerCategoria(req, res) {
+    await s.removerCategoria(req, idParams.parse(req.params).id);
+    res.status(204).end();
+  },
   async listarCategorias(_req, res) {
     res.json({ itens: await s.listarCategorias() });
   },

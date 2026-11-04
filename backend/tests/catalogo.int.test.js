@@ -122,4 +122,45 @@ test('catalogo (integracao)', { skip: !habilitado && 'defina SV_TEST_DB=1' }, as
     });
     assert.equal(r.status, 422);
   });
+
+  await t.test('marcas e categorias: contagem, exclusao segura e protecao contra ciclos', async () => {
+    const m = await api('POST', '/admin/marcas', { token: operador, body: { nome: 'Marca Temp' } });
+    const sem = await api('POST', '/admin/marcas', { token: operador, body: { nome: 'Sem Produtos' } });
+    const p = await api('POST', '/admin/produtos', {
+      token: operador, body: { nome: 'Com marca', marca_id: m.body.id, variacoes: [variacao('MT-1', 9)] },
+    });
+    assert.equal(p.status, 201);
+
+    const lista = (await api('GET', '/admin/marcas', { token: operador })).body.itens;
+    assert.equal(lista.find((x) => x.id === m.body.id).produtos, 1);
+    assert.equal(lista.find((x) => x.id === sem.body.id).produtos, 0);
+
+    const emUso = await api('DELETE', `/admin/marcas/${m.body.id}`, { token: admin });
+    assert.equal(emUso.status, 409);
+    assert.equal(emUso.body.erro.codigo, 'MARCA_EM_USO');
+    assert.equal((await api('DELETE', `/admin/marcas/${sem.body.id}`, { token: operador })).status, 204);
+    assert.equal((await api('DELETE', `/admin/marcas/${sem.body.id}`, { token: admin })).status, 404);
+    assert.equal((await api('DELETE', `/admin/marcas/${m.body.id}`, { token: financeiro })).status, 403);
+
+    const a = await api('POST', '/admin/categorias', { token: operador, body: { nome: 'Nivel A' } });
+    const b = await api('POST', '/admin/categorias', { token: operador, body: { nome: 'Nivel B', pai_id: a.body.id } });
+    const c = await api('POST', '/admin/categorias', { token: operador, body: { nome: 'Nivel C', pai_id: b.body.id } });
+    // A sob C formaria o ciclo A -> B -> C -> A
+    const ciclo = await api('PUT', `/admin/categorias/${a.body.id}`, { token: operador, body: { nome: 'Nivel A', pai_id: c.body.id } });
+    assert.equal(ciclo.status, 422);
+    assert.equal(ciclo.body.erro.codigo, 'CATEGORIA_CICLICA');
+    assert.equal((await api('PUT', `/admin/categorias/${a.body.id}`, { token: operador, body: { nome: 'Nivel A', pai_id: a.body.id } })).status, 422);
+
+    await api('PUT', `/admin/produtos/${p.body.id}`, { token: operador, body: { categorias_ids: [b.body.id] } });
+    const cats = (await api('GET', '/admin/categorias', { token: operador })).body.itens;
+    assert.equal(cats.find((x) => x.id === b.body.id).produtos, 1);
+    assert.equal((await api('DELETE', `/admin/categorias/${b.body.id}`, { token: admin })).body.erro.codigo, 'CATEGORIA_EM_USO');
+
+    // C nao tem produtos: exclui; depois libera B e exclui tambem
+    assert.equal((await api('DELETE', `/admin/categorias/${c.body.id}`, { token: admin })).status, 204);
+    await api('PUT', `/admin/produtos/${p.body.id}`, { token: operador, body: { categorias_ids: [] } });
+    assert.equal((await api('DELETE', `/admin/categorias/${b.body.id}`, { token: admin })).status, 204);
+    const [[aud]] = await pool.query("SELECT COUNT(*) n FROM logs_auditoria WHERE acao IN ('marca.excluir', 'categoria.excluir')");
+    assert.equal(Number(aud.n), 3);
+  });
 });

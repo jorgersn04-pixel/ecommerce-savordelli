@@ -159,8 +159,12 @@ async function removerImagem(req, id) {
 
 // ------------------------------------------------------ marcas e categorias
 async function listarMarcas() {
-  const [rows] = await pool.query('SELECT id, nome, slug, ativo FROM marcas ORDER BY nome');
-  return rows;
+  const [rows] = await pool.query(
+    `SELECT m.id, m.nome, m.slug, m.ativo,
+            (SELECT COUNT(*) FROM produtos p WHERE p.marca_id = m.id AND p.excluido_em IS NULL) AS produtos
+       FROM marcas m ORDER BY m.nome`,
+  );
+  return rows.map((r) => ({ ...r, produtos: Number(r.produtos) }));
 }
 
 async function criarMarca(req, { nome, ativo }) {
@@ -181,8 +185,13 @@ async function atualizarMarca(req, id, { nome, ativo }) {
 }
 
 async function listarCategorias() {
-  const [rows] = await pool.query('SELECT * FROM categorias ORDER BY pai_id, ordem, nome');
-  return rows;
+  const [rows] = await pool.query(
+    `SELECT c.*,
+            (SELECT COUNT(*) FROM produto_categorias pc JOIN produtos p ON p.id = pc.produto_id
+              WHERE pc.categoria_id = c.id AND p.excluido_em IS NULL) AS produtos
+       FROM categorias c ORDER BY c.pai_id, c.ordem, c.nome`,
+  );
+  return rows.map((r) => ({ ...r, produtos: Number(r.produtos) }));
 }
 
 async function criarCategoria(req, d) {
@@ -201,6 +210,13 @@ async function atualizarCategoria(req, id, d) {
   if (d.pai_id && String(d.pai_id) === String(id)) {
     throw new AppError(422, 'CATEGORIA_CICLICA', 'Uma categoria nao pode ser pai de si mesma');
   }
+  // Impede ciclos indiretos (A -> B -> A): sobe pela cadeia de ancestrais do novo pai.
+  let atual = d.pai_id ? String(d.pai_id) : null;
+  for (let n = 0; atual && n < 50; n += 1) {
+    if (atual === String(id)) throw new AppError(422, 'CATEGORIA_CICLICA', 'A categoria nao pode ficar abaixo de uma de suas subcategorias');
+    const [[pai]] = await pool.execute('SELECT pai_id FROM categorias WHERE id = ?', [atual]);
+    atual = pai?.pai_id ? String(pai.pai_id) : null;
+  }
   const [r] = await pool.execute(
     `UPDATE categorias SET nome = ?, pai_id = ?, ordem = COALESCE(?, ordem),
             ativo = COALESCE(?, ativo), bling_categoria_id = ? WHERE id = ?`,
@@ -210,7 +226,31 @@ async function atualizarCategoria(req, id, d) {
   await auditar(null, req, 'categoria.editar', 'categoria', id, d);
 }
 
+/** Remove a marca somente se nenhum produto ativo no catalogo a utiliza (senao, desative). */
+async function removerMarca(req, id) {
+  const [[m]] = await pool.execute('SELECT nome FROM marcas WHERE id = ?', [id]);
+  if (!m) throw new AppError(404, 'MARCA_NAO_ENCONTRADA', 'Marca nao encontrada');
+  const [[{ n }]] = await pool.execute('SELECT COUNT(*) AS n FROM produtos WHERE marca_id = ? AND excluido_em IS NULL', [id]);
+  if (Number(n) > 0) throw new AppError(409, 'MARCA_EM_USO', `Ha ${n} produto(s) com esta marca. Desative-a ou troque a marca dos produtos`);
+  await pool.execute('DELETE FROM marcas WHERE id = ?', [id]);
+  await auditar(null, req, 'marca.excluir', 'marca', id, { nome: m.nome });
+}
+
+/** Subcategorias passam a ser raiz (FK SET NULL); bloqueia se houver produtos vinculados. */
+async function removerCategoria(req, id) {
+  const [[c]] = await pool.execute('SELECT nome FROM categorias WHERE id = ?', [id]);
+  if (!c) throw new AppError(404, 'CATEGORIA_NAO_ENCONTRADA', 'Categoria nao encontrada');
+  const [[{ n }]] = await pool.execute(
+    'SELECT COUNT(*) AS n FROM produto_categorias pc JOIN produtos p ON p.id = pc.produto_id WHERE pc.categoria_id = ? AND p.excluido_em IS NULL',
+    [id],
+  );
+  if (Number(n) > 0) throw new AppError(409, 'CATEGORIA_EM_USO', `Ha ${n} produto(s) nesta categoria. Desative-a ou remova o vinculo`);
+  await pool.execute('DELETE FROM categorias WHERE id = ?', [id]);
+  await auditar(null, req, 'categoria.excluir', 'categoria', id, { nome: c.nome });
+}
+
 module.exports = {
+  removerMarca, removerCategoria,
   criarProduto, atualizarProduto, excluirProduto, listarProdutos, obterProduto,
   criarVariacao, atualizarVariacao, ajustarEstoque,
   adicionarImagem, removerImagem,
