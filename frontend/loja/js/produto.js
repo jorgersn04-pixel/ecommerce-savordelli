@@ -171,10 +171,12 @@ async function iniciar() {
     }
     const rotulo = botao.textContent;
     botao.disabled = true;
+    await casca.pronta; // garante o token do cliente (carrinho vinculado a conta)
     botao.textContent = 'Adicionando...';
     try {
       await adicionarAoCarrinho(estado.variacao.id, estado.quantidade);
       toast(`${estado.quantidade} ${plural(estado.quantidade, 'item adicionado', 'itens adicionados')} à sacola.`);
+      montar(status, h('p', { class: 'aviso aviso-sucesso' }, 'Adicionado à sacola. ', h('a', { class: 'link-sutil', href: 'sacola.html' }, 'Ver sacola e finalizar a compra')));
       await casca.atualizarContador();
     } catch (err) {
       montar(status, h('p', { class: 'aviso aviso-erro', role: 'alert' }, err.codigo === 'ESTOQUE_INSUFICIENTE' ? `Estoque insuficiente. Disponível: ${err.detalhes?.disponivel ?? 0}.` : err.message));

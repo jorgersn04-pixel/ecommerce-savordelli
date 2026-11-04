@@ -237,3 +237,10 @@
   .secao { padding: 40px 0; }
   .skeleton-card { height: 300px; }
 }
+
+/* Seletor de quantidade (produto e sacola) */
+.quantidade { display: inline-flex; align-items: center; border: 1px solid var(--cor-borda); border-radius: var(--raio); background: var(--cor-card); width: fit-content; }
+.quantidade button { width: 46px; height: 46px; display: grid; place-items: center; background: transparent; border: 0; cursor: pointer; border-radius: var(--raio); }
+.quantidade button:hover:not(:disabled) { background: var(--cor-creme); }
+.quantidade button:disabled { opacity: 0.4; cursor: not-allowed; }
+.quantidade output { min-width: 44px; text-align: center; font-weight: 700; }

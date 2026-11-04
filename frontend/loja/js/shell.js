@@ -3,6 +3,7 @@ import { h, montar } from './core/ui.js';
 import { icone } from './core/icones.js';
 import { obterCarrinho } from './core/api.js';
 import { buscarCategorias, buscarMarcas } from './core/catalogo.js';
+import { restaurar, usuarioAtual, sair } from './core/sessao.js';
 
 const href = (params) => `index.html?${new URLSearchParams(params)}`;
 
@@ -16,6 +17,7 @@ export function montarCasca() {
     type: 'search', name: 'q', placeholder: 'Buscar perfumes, maquiagem, cuidados...', autocomplete: 'off',
     'aria-label': 'Buscar produtos', value: params.get('q') || '',
   });
+  const conta = h('div', { class: 'conta' });
   const navCategorias = h('ul', { class: 'nav-itens' });
   const listaMarcasMenu = h('ul', {});
   const menuMarcas = h(
@@ -45,6 +47,7 @@ export function montarCasca() {
         h(
           'div',
           { class: 'header-acoes' },
+          conta,
           h('a', { class: 'link-sacola', href: 'sacola.html', 'aria-label': 'Sacola' }, icone('sacola'), h('span', { class: 'rotulo' }, 'Sacola'), contador),
         ),
       ),
@@ -129,6 +132,24 @@ export function montarCasca() {
     return marcas;
   }
 
-  atualizarContador();
-  return { atualizarContador, carregarCategorias, carregarMarcas };
+  function renderizarConta() {
+    const u = usuarioAtual();
+    if (u) {
+      const primeiro = String(u.nome || '').trim().split(/s+/)[0] || 'cliente';
+      montar(conta, h('span', { class: 'conta-nome' }, `Olá, ${primeiro}`), h('button', { class: 'link-conta', type: 'button', onclick: async () => { await sair(); window.location.assign('./'); } }, 'Sair'));
+    } else {
+      const atual = window.location.pathname.split('/').pop() || 'index.html';
+      const destino = ['identificacao.html', 'checkout.html'].includes(atual) ? 'index.html' : atual + window.location.search;
+      montar(conta, h('a', { class: 'link-conta', href: `identificacao.html?next=${encodeURIComponent(destino)}` }, 'Entrar'));
+    }
+  }
+
+  renderizarConta();
+  // `pronta`: sessao restaurada (se houver) e contador atualizado. Paginas que dependem do carrinho/conta aguardam.
+  const pronta = restaurar().catch(() => null).then(() => {
+    renderizarConta();
+    return atualizarContador();
+  });
+
+  return { atualizarContador, carregarCategorias, carregarMarcas, pronta, renderizarConta };
 }
