@@ -9,5 +9,6 @@ router.use('/health', health);
 router.use('/auth', require('./auth.routes'));
 router.use('/admin', require('./admin.routes'));
 router.use('/catalogo', require('./catalogo.routes'));
+router.use(require('./carrinho.routes'));
 
 module.exports = router;

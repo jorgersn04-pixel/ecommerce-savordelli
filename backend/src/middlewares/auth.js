@@ -24,4 +24,17 @@ function autenticar(tipoExigido) {
   };
 }
 
-module.exports = { autenticar };
+/**
+ * Identifica o cliente se houver Bearer; sem header segue anonimo.
+ * Token presente porem invalido/expirado responde 401 (o frontend deve renovar e repetir).
+ * Tokens de admin sao ignorados (a loja trata como visitante).
+ */
+function autenticarOpcional(req, _res, next) {
+  const [esquema, token] = (req.headers.authorization || '').split(' ');
+  if (esquema !== 'Bearer' || !token) return next();
+  const usuario = verificarAccessToken(token);
+  if (usuario.tipo === 'cliente') req.usuario = usuario;
+  return next();
+}
+
+module.exports = { autenticar, autenticarOpcional };

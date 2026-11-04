@@ -23,6 +23,19 @@ const schema = z.object({
   REFRESH_TTL_DAYS: z.coerce.number().int().positive().default(30),
   ENCRYPTION_KEY: z.string().regex(/^[0-9a-fA-F]{64}$/, 'hex de 64 caracteres (32 bytes)'),
   HMAC_KEY: z.string().min(32, 'minimo de 32 caracteres'),
+
+  // Frete (Melhor Envio). Sem token em dev/test usa cotacao simulada; em producao e obrigatorio.
+  CEP_ORIGEM: z.string().regex(/^\d{8}$/, '8 digitos').optional(),
+  MELHOR_ENVIO_TOKEN: z.string().optional(),
+  MELHOR_ENVIO_AMBIENTE: z.enum(['sandbox', 'producao']).default('sandbox'),
+  MELHOR_ENVIO_EMAIL_CONTATO: z.string().default(''),
+  MELHOR_ENVIO_SERVICOS: z.string().default('1,2'),
+  FRETE_CACHE_HORAS: z.coerce.number().positive().default(6),
+
+  // Pagamentos (Mercado Pago). Sem token em dev/test usa gateway simulado; em producao e obrigatorio.
+  MERCADOPAGO_ACCESS_TOKEN: z.string().optional(),
+  MERCADOPAGO_WEBHOOK_SECRET: z.string().optional(),
+  API_PUBLIC_URL: z.string().url().optional(),
 });
 
 const parsed = schema.safeParse(process.env);
