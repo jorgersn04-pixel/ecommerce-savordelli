@@ -12,6 +12,9 @@ export const CONFIG = {
   PARCELAS_MAX: 12,
   PARCELA_MINIMA: 20, // valor minimo de cada parcela, em reais
 
+  // Marcas revendidas (loja multimarcas). Usadas como fallback quando a API ainda nao tem marcas cadastradas.
+  MARCAS_PADRAO: ['Natura', 'Avon', 'Eudora', 'O Boticário', 'Mahogany', "L'Occitane"],
+
   PRODUTOS_POR_PAGINA: 12,
   DESTAQUES_HOME: 8,
   ESTOQUE_BAIXO: 5, // abaixo disso mostra "Restam N unidades"

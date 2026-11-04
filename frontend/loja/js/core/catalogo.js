@@ -1,6 +1,7 @@
 // Acesso ao catalogo com fallback de demonstracao (somente se CONFIG.DEMO_SE_VAZIO e o catalogo real estiver vazio).
 import { CONFIG } from '../config.js';
-import { listarProdutos, obterProduto, listarCategorias, ApiError } from './api.js';
+import { listarProdutos, obterProduto, listarCategorias, listarMarcas, ApiError } from './api.js';
+import { slugify } from './format.js';
 import { listaDemo, detalheDemo, CATEGORIAS_DEMO } from '../mock.js';
 
 const CHAVE = 'sv_demo';
@@ -36,6 +37,17 @@ export async function buscarProduto(slug) {
     if (p) return { produto: p, demo: true };
   }
   return { produto: await obterProduto(slug), demo: false };
+}
+
+/** Marcas ativas. Sem marcas cadastradas (ou API fora), usa as marcas padrao da loja. */
+export async function buscarMarcas() {
+  const padrao = CONFIG.MARCAS_PADRAO.map((nome, i) => ({ id: `padrao-${i}`, nome, slug: slugify(nome) }));
+  try {
+    const { itens } = await listarMarcas();
+    return itens.length ? itens : padrao;
+  } catch {
+    return padrao;
+  }
 }
 
 export async function buscarCategorias() {

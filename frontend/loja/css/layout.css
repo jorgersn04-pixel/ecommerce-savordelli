@@ -219,7 +219,7 @@
 
 /* ---------------------------------------------------------------- Footer (escuro) */
 .site-footer { background: var(--cor-escuro); color: var(--cor-texto-claro-2); margin-top: 24px; }
-.footer-grade { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 40px; padding: 56px 0 40px; }
+.footer-grade { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 40px; padding: 56px 0 40px; }
 .site-footer h2 { font-family: var(--fonte-ui); font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--cor-ouro); margin-bottom: 16px; }
 .site-footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 .site-footer a { color: var(--cor-texto-claro-2); text-decoration: none; }
@@ -239,4 +239,83 @@
 @media (max-width: 600px) {
   .banners-duplos { grid-template-columns: minmax(0, 1fr); }
   .link-sacola .rotulo { display: none; }
+}
+
+/* ---------------------------------------------------------------- Menu de marcas (dropdown acessivel) */
+.nav-linha { display: flex; align-items: stretch; gap: 8px; }
+.nav-itens { flex: 1; min-width: 0; }
+.menu-marcas { position: relative; flex: none; }
+.menu-marcas summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+  padding: 12px 14px;
+  list-style: none;
+  cursor: pointer;
+  color: var(--cor-ouro);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  border-right: 1px solid #2a241c;
+}
+.menu-marcas summary::-webkit-details-marker { display: none; }
+.menu-marcas summary::after { content: ''; width: 7px; height: 7px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg) translateY(-2px); }
+.menu-marcas[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+.menu-marcas-painel {
+  position: absolute;
+  top: calc(100% + 1px);
+  left: 0;
+  z-index: 70;
+  min-width: 240px;
+  padding: 8px;
+  background: var(--cor-escuro-2);
+  border: 1px solid #3a3228;
+  border-top: 2px solid var(--cor-ouro);
+  border-radius: 0 0 var(--raio) var(--raio);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+.menu-marcas-painel ul { display: grid; gap: 2px; list-style: none; margin: 0; padding: 0; }
+.menu-marcas-painel a { display: block; padding: 10px 12px; border-radius: var(--raio-pequeno); color: var(--cor-texto-claro); text-decoration: none; font-weight: 600; }
+.menu-marcas-painel a:hover,
+.menu-marcas-painel a[aria-current='true'] { background: rgba(201, 151, 43, 0.14); color: var(--cor-ouro); }
+
+/* ---------------------------------------------------------------- Secao de marcas (home) */
+.grade-marcas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; list-style: none; margin: 0; padding: 0; }
+.card-marca-home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 132px;
+  padding: 20px;
+  background: var(--cor-card);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  text-decoration: none;
+  text-align: center;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.card-marca-home:hover { box-shadow: var(--sombra-hover); border-color: #d8c9ae; }
+.card-marca-home .nome-marca { font-family: var(--fonte-titulo); font-weight: 600; font-size: 1.75rem; line-height: 1.1; letter-spacing: 0.04em; }
+.card-marca-home .ver { font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--cor-texto-2); }
+.card-marca-home .ver::after { content: ''; display: block; width: 28px; height: 2px; margin: 8px auto 0; background: var(--cor-ouro); transition: width 0.2s; }
+.card-marca-home:hover .ver::after { width: 56px; }
+
+@media (max-width: 900px) {
+  .grade-marcas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .footer-grade { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .footer-marca { grid-column: 1 / -1; }
+}
+@media (max-width: 480px) {
+  .grade-marcas { gap: 10px; }
+  .card-marca-home { min-height: 108px; padding: 14px; }
+  .card-marca-home .nome-marca { font-size: 1.375rem; }
+}
+
+/* Filtros da listagem (marca e categoria) */
+.filtros-grupo { display: flex; align-items: center; gap: 14px; margin-top: 16px; flex-wrap: wrap; }
+.filtros-rotulo { min-width: 84px; font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cor-texto-2); }
+@media (max-width: 600px) {
+  .filtros-grupo { align-items: flex-start; flex-direction: column; gap: 8px; }
 }

@@ -38,4 +38,12 @@ export function formatarCep(valor) {
   return d.length > 5 ? `${d.slice(0, 5)}-${d.slice(5)}` : d;
 }
 
+/** Mesma regra de slug do painel/API: "L'Occitane" -> "l-occitane". */
+export function slugify(texto) {
+  return String(texto).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
+/** Selo de confianca da marca: dinamico quando ha marca; generico forte caso contrario. */
+export const textoOriginal = (marca) => (marca ? `Produto Original ${marca}` : 'Original e Lacrado');
+
 export const plural = (n, singular, pluralTxt) => (n === 1 ? singular : pluralTxt);

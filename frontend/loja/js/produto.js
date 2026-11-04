@@ -3,7 +3,7 @@ import { h, montar, toast } from './core/ui.js';
 import { icone } from './core/icones.js';
 import { buscarProduto } from './core/catalogo.js';
 import { adicionarAoCarrinho, cotarFrete, ApiError } from './core/api.js';
-import { moeda, percentualDesconto, textoParcelamento, rotuloVariacao, formatarCep, plural } from './core/format.js';
+import { moeda, percentualDesconto, textoParcelamento, rotuloVariacao, formatarCep, plural, textoOriginal } from './core/format.js';
 import { imagemProduto } from './componentes/card-produto.js';
 import { montarCasca } from './shell.js';
 
@@ -21,14 +21,14 @@ function telaErro(titulo, texto) {
 }
 
 /** Faixa de confianca junto ao botao de compra. */
-function faixaConfianca() {
+function faixaConfianca(marca) {
   const item = (ic, titulo, sub) => h('li', {}, icone(ic), h('span', {}, titulo, h('small', {}, sub)));
   return h(
     'ul',
     { class: 'faixa-confianca', 'aria-label': 'Garantias da compra' },
     item('pix', 'Pague com Pix', 'Aprovação imediata'),
     item('cartao', `Em até ${CONFIG.PARCELAS_MAX}x sem juros`, 'No cartão de crédito'),
-    item('original', 'Produto Original Boticário', 'Procedência garantida'),
+    item('original', textoOriginal(marca), 'Procedência garantida'),
   );
 }
 
@@ -47,6 +47,7 @@ async function iniciar() {
     if (e instanceof ApiError && e.status === 404) telaErro('Produto não encontrado', 'Ele pode ter sido removido ou o endereço está incorreto.');
     else telaErro('Não foi possível carregar o produto', e.message);
     casca.carregarCategorias();
+    casca.carregarMarcas();
     return;
   }
   const { produto, demo } = resultado;
@@ -252,11 +253,11 @@ async function iniciar() {
         h(
           'div',
           { class: 'produto-info' },
-          h('div', {}, produto.marca_nome ? h('span', { class: 'produto-marca' }, produto.marca_nome) : null, h('h1', {}, produto.nome), produto.descricao_curta ? h('p', { class: 'produto-resumo' }, produto.descricao_curta) : null),
+          h('div', {}, produto.marca_nome ? h('a', { class: 'produto-marca', href: `index.html?marca=${encodeURIComponent(produto.marca_slug)}` }, produto.marca_nome) : null, h('h1', {}, produto.nome), produto.descricao_curta ? h('p', { class: 'produto-resumo' }, produto.descricao_curta) : null),
           blocoPreco,
           grupoVariacao,
           h('div', { class: 'campo-grupo' }, h('span', { class: 'campo-rotulo' }, 'Quantidade'), h('div', { class: 'quantidade' }, btnMenos, qtdValor, btnMais), estoqueAviso),
-          h('div', { class: 'compra' }, btnComprar, faixaConfianca(), status),
+          h('div', { class: 'compra' }, btnComprar, faixaConfianca(produto.marca_nome), status),
           frete,
         ),
       ),
@@ -269,7 +270,7 @@ async function iniciar() {
   // Barra fixa do mobile: preco + comprar, com a confianca resumida numa linha.
   document.body.append(
     h('div', { class: 'barra-mobile', role: 'region', 'aria-label': 'Comprar' },
-      h('div', { class: 'mini-confianca' }, 'Pix · Parcele sem juros · Produto Original Boticário'),
+      h('div', { class: 'mini-confianca' }, `Pix · Parcele sem juros · ${textoOriginal(produto.marca_nome)}`),
       h('div', { class: 'linha' }, barraPreco, btnComprarMobile)),
   );
   document.body.classList.add('com-barra');
@@ -277,7 +278,7 @@ async function iniciar() {
   renderVariacoes();
   renderGaleria();
   atualizarPreco();
-  await casca.carregarCategorias(categoria?.slug);
+  await Promise.all([casca.carregarCategorias(categoria?.slug), casca.carregarMarcas(produto.marca_slug)]);
 }
 
 iniciar();

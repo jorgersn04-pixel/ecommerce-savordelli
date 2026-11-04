@@ -1,8 +1,8 @@
-// Casca compartilhada: header (escuro), navegacao por categorias, footer (escuro) e contador da sacola.
-import { h, montar, toast } from './core/ui.js';
+// Casca compartilhada: header (escuro), navegacao por marcas e categorias, footer (escuro) e contador da sacola.
+import { h, montar } from './core/ui.js';
 import { icone } from './core/icones.js';
 import { obterCarrinho } from './core/api.js';
-import { buscarCategorias } from './core/catalogo.js';
+import { buscarCategorias, buscarMarcas } from './core/catalogo.js';
 
 const href = (params) => `index.html?${new URLSearchParams(params)}`;
 
@@ -16,7 +16,14 @@ export function montarCasca() {
     type: 'search', name: 'q', placeholder: 'Buscar perfumes, maquiagem, cuidados...', autocomplete: 'off',
     'aria-label': 'Buscar produtos', value: params.get('q') || '',
   });
-  const navLista = h('ul', {});
+  const navCategorias = h('ul', { class: 'nav-itens' });
+  const listaMarcasMenu = h('ul', {});
+  const menuMarcas = h(
+    'details',
+    { class: 'menu-marcas' },
+    h('summary', {}, 'Marcas'),
+    h('div', { class: 'menu-marcas-painel' }, listaMarcasMenu),
+  );
 
   const cabecalho = document.getElementById('cabecalho');
   cabecalho.className = 'site-header escuro';
@@ -38,26 +45,28 @@ export function montarCasca() {
         h(
           'div',
           { class: 'header-acoes' },
-          h(
-            'button',
-            {
-              class: 'link-sacola', type: 'button', 'aria-label': 'Sacola',
-              // A pagina da sacola e a proxima etapa; o contador ja reflete o carrinho real da API.
-              onclick: () => toast('A sacola completa será liberada na próxima etapa da loja.'),
-            },
-            icone('sacola'),
-            h('span', { class: 'rotulo' }, 'Sacola'),
-            contador,
-          ),
+          h('a', { class: 'link-sacola', href: 'sacola.html', 'aria-label': 'Sacola' }, icone('sacola'), h('span', { class: 'rotulo' }, 'Sacola'), contador),
         ),
       ),
     ),
     h('hr', { class: 'filete' }),
-    h('nav', { class: 'nav-categorias', 'aria-label': 'Categorias' }, h('div', { class: 'container' }, navLista)),
+    h('nav', { class: 'nav-categorias', 'aria-label': 'Marcas e categorias' }, h('div', { class: 'container nav-linha' }, menuMarcas, navCategorias)),
   );
 
+  // Fecha o menu de marcas ao clicar fora ou com Esc.
+  document.addEventListener('click', (e) => {
+    if (menuMarcas.open && !menuMarcas.contains(e.target)) menuMarcas.open = false;
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menuMarcas.open) {
+      menuMarcas.open = false;
+      menuMarcas.querySelector('summary').focus();
+    }
+  });
+
   const anoAtual = new Date().getFullYear();
-  const listaRodape = h('ul', {}, h('li', {}, h('a', { href: './' }, 'Página inicial')), h('li', {}, h('a', { href: href({ todos: 1 }) }, 'Todos os produtos')));
+  const colNavegue = h('ul', {}, h('li', {}, h('a', { href: './' }, 'Página inicial')), h('li', {}, h('a', { href: href({ todos: 1 }) }, 'Todos os produtos')));
+  const colMarcas = h('ul', {});
   const rodape = document.getElementById('rodape');
   rodape.className = 'site-footer escuro';
   montar(
@@ -73,15 +82,11 @@ export function montarCasca() {
           'div',
           { class: 'footer-marca' },
           h('a', { class: 'logo', href: './' }, 'Savordelli', h('small', {}, 'Cosméticos')),
-          h('p', {}, 'Perfumaria, maquiagem e cuidados com a pele. Produtos originais, com compra segura e entrega para todo o Brasil.'),
+          h('p', {}, 'Perfumaria, maquiagem e cuidados com a pele das melhores marcas. Produtos originais, compra segura e entrega para todo o Brasil.'),
         ),
-        h('div', {}, h('h2', {}, 'Navegue'), listaRodape),
-        h(
-          'div',
-          {},
-          h('h2', {}, 'Formas de pagamento'),
-          h('ul', {}, h('li', {}, 'Pix'), h('li', {}, 'Cartão de crédito'), h('li', {}, 'Boleto bancário')),
-        ),
+        h('div', {}, h('h2', {}, 'Navegue'), colNavegue),
+        h('div', {}, h('h2', {}, 'Marcas'), colMarcas),
+        h('div', {}, h('h2', {}, 'Pagamento'), h('ul', {}, h('li', {}, 'Pix'), h('li', {}, 'Cartão de crédito'), h('li', {}, 'Boleto bancário'))),
       ),
       h('div', { class: 'footer-base' }, h('span', {}, `© ${anoAtual} Savordelli Cosméticos. Todos os direitos reservados.`)),
     ),
@@ -104,19 +109,26 @@ export function montarCasca() {
     try {
       const { itens } = await buscarCategorias();
       const raiz = itens.filter((c) => !c.pai_id);
-      montar(
-        navLista,
-        raiz.map((c) => h('li', {}, h('a', { href: href({ categoria: c.slug }), 'aria-current': c.slug === slugAtivo ? 'true' : null }, c.nome))),
-      );
-      if (raiz.length) {
-        listaRodape.append(...raiz.slice(0, 6).map((c) => h('li', {}, h('a', { href: href({ categoria: c.slug }) }, c.nome))));
-      }
+      montar(navCategorias, raiz.map((c) => h('li', {}, h('a', { href: href({ categoria: c.slug }), 'aria-current': c.slug === slugAtivo ? 'true' : null }, c.nome))));
+      colNavegue.append(...raiz.slice(0, 5).map((c) => h('li', {}, h('a', { href: href({ categoria: c.slug }) }, c.nome))));
       return itens;
     } catch {
       return [];
     }
   }
 
+  async function carregarMarcas(slugAtivo) {
+    const marcas = await buscarMarcas();
+    montar(
+      listaMarcasMenu,
+      h('li', {}, h('a', { href: 'index.html?todos=1#marcas' }, 'Todas as marcas')),
+      marcas.map((m) => h('li', {}, h('a', { href: href({ marca: m.slug }), 'aria-current': m.slug === slugAtivo ? 'true' : null }, m.nome))),
+    );
+    montar(colMarcas, marcas.map((m) => h('li', {}, h('a', { href: href({ marca: m.slug }) }, m.nome))));
+    if (slugAtivo) menuMarcas.querySelector('summary').classList.add('ativo');
+    return marcas;
+  }
+
   atualizarContador();
-  return { atualizarContador, carregarCategorias };
+  return { atualizarContador, carregarCategorias, carregarMarcas };
 }

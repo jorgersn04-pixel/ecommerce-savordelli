@@ -49,6 +49,7 @@ export function querystring(obj) {
 export const listarProdutos = (filtros) => get(`/catalogo/produtos${querystring(filtros)}`);
 export const obterProduto = (slug) => get(`/catalogo/produtos/${encodeURIComponent(slug)}`);
 export const listarCategorias = () => get('/catalogo/categorias');
+export const listarMarcas = () => get('/catalogo/marcas');
 
 // -------------------------------------------------------------- carrinho e frete
 export const obterCarrinho = () => get('/carrinho');
